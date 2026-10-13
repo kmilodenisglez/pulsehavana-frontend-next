@@ -41,4 +41,8 @@ export const productImages = {
   storeFront:
     PUBLIC +
     "AB6AXuCz30xTeI_aSIbE_oA7ljf9tPUiDVYbJTYX_ZbnruUAcms1OF4MxeNgkTZJLm8nTnoCQWRcgE1gizSagl8Fo9sK0lNVZ7mNb0YfmgTI_IqzwZ8aypSVLzZq0sKnhkVQfeq0QPbAXz2MdH8IOqn_0YucW_jX7JGKdYS6LThTg4A7Jq4Veq-Nt_D8IRtz4di1m3pOGJg0j0QjoNgg8RT-VxoMSwsPWYSDpPttj9LHIRy45fkoJ0Ir7zs",
+  solarPanel:
+    "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=1200&q=80",
+  powerStation:
+    "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1200&q=80",
 } as const;

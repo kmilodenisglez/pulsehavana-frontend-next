@@ -3,7 +3,9 @@ export type CategoryId =
   | "apple-iphone"
   | "samsung-galaxy"
   | "xiaomi"
-  | "accesorios";
+  | "accesorios"
+  | "panel-solar"
+  | "estacion-energia";
 
 export interface Category {
   id: CategoryId;

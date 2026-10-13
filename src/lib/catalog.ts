@@ -7,6 +7,8 @@ export const categories: Category[] = [
   { id: "samsung-galaxy", label: "Samsung Galaxy" },
   { id: "xiaomi", label: "Xiaomi" },
   { id: "accesorios", label: "Accesorios" },
+  { id: "panel-solar", label: "Panel Solar" },
+  { id: "estacion-energia", label: "Estación de Energía" },
 ];
 
 const appleBadges = [
@@ -364,8 +366,101 @@ const adapterUsbC: Product = {
   featured: false,
 };
 
+const panelSolar: Product = {
+  slug: "panel-solar-400w",
+  name: "Panel Solar 400W",
+  brand: "EcoVolt",
+  category: "panel-solar",
+  shortSpec: "400W • Monocristalino",
+  price: 420,
+  image: productImages.solarPanel,
+  stock: { status: "in-stock", label: "En stock" },
+  badge: { label: "Eficiencia", kind: "success", dot: true },
+  seriesTag: "Solar",
+  condition: "Certificado",
+  colorLabel: "Acabado",
+  description:
+    "Panel solar monocristalino de 400 W diseñado para carga doméstica y sistemas de respaldo con excelente rendimiento diario.",
+  gallery: [
+    {
+      src: productImages.solarPanel,
+      alt: "Panel solar 400W",
+      label: "Panel Solar",
+    },
+  ],
+  colors: [
+    { name: "Negro", hex: "#111827" },
+    { name: "Plata", hex: "#d1d5db" },
+  ],
+  storages: [
+    { label: "400W", price: 420 },
+    { label: "600W", price: 560 },
+  ],
+  specs: [
+    { icon: "solar_power", label: "Potencia", title: "400 W", subtitle: "Máxima generación diaria" },
+    { icon: "battery_charging_full", label: "Eficiencia", title: "21.8%", subtitle: "Alta conversión solar" },
+    { icon: "shield", label: "Durabilidad", title: "25 años", subtitle: "Garantía de rendimiento" },
+    { icon: "thermostat", label: "Uso", title: "Residencial", subtitle: "Sistema híbrido y autoconsumo" },
+  ],
+  detailBadges: [
+    { label: "Eficiencia certificada", kind: "success", dot: true },
+    { label: "Instalación guiada", kind: "primary", icon: "support_agent", iconFilled: true },
+  ],
+  featured: true,
+};
+
+const estacionEnergia: Product = {
+  slug: "estacion-energia-portatil-1kwh",
+  name: "Estación de Energía 1 kWh",
+  brand: "VoltNest",
+  category: "estacion-energia",
+  shortSpec: "1 kWh • Portátil",
+  price: 890,
+  image: productImages.powerStation,
+  stock: { status: "low-stock", label: "Pocas unidades" },
+  badge: { label: "Backup", kind: "primary", dot: true },
+  seriesTag: "Power Station",
+  condition: "Lista para uso",
+  colorLabel: "Acabado",
+  description:
+    "Estación de energía portátil con salida estable para respaldo doméstico, herramientas y equipos esenciales en cualquier momento.",
+  gallery: [
+    {
+      src: productImages.powerStation,
+      alt: "Estación de energía portátil",
+      label: "Power Station",
+    },
+  ],
+  colors: [
+    { name: "Gris", hex: "#6b7280" },
+    { name: "Negro", hex: "#111827" },
+  ],
+  storages: [
+    { label: "1 kWh", price: 890 },
+    { label: "2 kWh", price: 1240 },
+  ],
+  specs: [
+    { icon: "battery_charging_full", label: "Capacidad", title: "1 kWh", subtitle: "Almacenamiento portátil" },
+    { icon: "bolt", label: "Potencia", title: "1200 W", subtitle: "Salida continua estable" },
+    { icon: "sync", label: "Carga", title: "Solar + AC", subtitle: "Carga híbrida rápida" },
+    { icon: "timer", label: "Autonomía", title: "Hasta 12h", subtitle: "Dependiendo del consumo" },
+  ],
+  detailBadges: [
+    { label: "Respaldo doméstico", kind: "primary", dot: true },
+    { label: "Carga solar compatible", kind: "success", icon: "solar_power", iconFilled: true },
+  ],
+  featured: true,
+};
+
 /** Products shown in the storefront grid. */
-export const products: Product[] = [iphone15ProMax, iphone14, galaxyS24Ultra, iphone13];
+export const products: Product[] = [
+  iphone15ProMax,
+  iphone14,
+  galaxyS24Ultra,
+  iphone13,
+  panelSolar,
+  estacionEnergia,
+];
 
 /** Everything resolvable by slug (catalog + extras used by the cart). */
 export const allProducts: Product[] = [...products, iphone15Pro, adapterUsbC];
