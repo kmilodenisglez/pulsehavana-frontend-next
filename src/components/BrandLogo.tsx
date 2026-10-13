@@ -1,0 +1,15 @@
+import Image from "next/image";
+import { logoUrl } from "@/lib/assets";
+
+export function BrandLogo({ className = "" }: { className?: string }) {
+  return (
+    <Image
+      src={logoUrl}
+      alt="Pulse Havana Logo"
+      width={128}
+      height={32}
+      unoptimized
+      className={`h-8 w-auto object-contain shrink-0 ${className}`}
+    />
+  );
+}

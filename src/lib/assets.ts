@@ -1,0 +1,46 @@
+/** Design media hosted on Google's AIDA CDN. */
+const PUBLIC = "https://lh3.googleusercontent.com/aida-public/";
+const BLOB = "https://lh3.googleusercontent.com/aida/";
+
+export const logoUrl =
+  BLOB +
+  "AEtjO1X1yhBPDNN2w5UHBIgQlIy1Q9XHorlnt-6tX4TnjCSN1VNYIjIvmjMPkWhgr8ny_XPRAJTwjYarT6SbpKa2UKHjVFoVdyPFl0Pmb9RBy8OWD9J5nzdPfNuWQYqr0K2nVLWN7Qqr0yenDqm0Nmif8RXptCUx_2cfSGIarvn2fcxM1lxvfqpQBSjXMFpXBqMNxZTgJ81hFCtVHEaJXDQUrpc4L_6mlx2m4et6UepDGdJ36_mzS-zmqjSc";
+
+export const productImages = {
+  iphone15ProMax:
+    PUBLIC +
+    "AB6AXuA6iJFRBk7YIpk6OngBkxvtwZKskaH0sh1Xg6Ugg0nUmre3NWsnUhV78P_kwzROhUglCw8HWMcUYpEq0WpJMEiVvm61tgH42EmgmgEq8mCc0GIAoCx8mtEfPaq2TepcX3MJXYMzhDtO9Sipo0opLPudoyE2S06pWMUwu50FjVfkJhGImDAOr4rJvkd3hlGDnNwSTDP3zEMHeWiZQlcf_JFNI9vYQdQxpcF8n1N-riu5RBv7C76yUdQ",
+  iphone14:
+    PUBLIC +
+    "AB6AXuDNfnPTtBdU8z628XE106IyDFok0BHF6P8-WPPAmAk1Ac8tkYmxWIkLU1t0vdPj6bT7oRSZBisHRp_ku9GPh-iCwp3G3yfBOTL0jpDIDLCHqMov5JcAiGPYKZSEq9oBCQEB71QPRnAzkMoJqAssM0x0vUy45W2ymam2emueUy_OdBk8iE0_DOY1RCVyUSiD41sgvDq2WEeuBsgwele2_zxPlAoAUVgR6GV7zCsLfi4OD1yLQ62fWR4",
+  galaxyS24Ultra:
+    PUBLIC +
+    "AB6AXuA8PREatewAL0Gzd1y55wmjEx4fWABLVLxQ_CwnnNxmh29NnDrNys_Big3qIRJ0uoQi-xGYN4GbwG0bgoezX0wS8DhGibnEclrhIIXcaEmJZ_hiJDnq-G5s4CEsb9tdLwqJ_C0gscApRCZUGw4-NFK1hI25qQXDTnM1eBnlCXhWe-b08rwutM5XAucrmkKcZgpzB41qyPQpROvueE8jX5XMCqH6RqXcKkP0WJ_xYFNGdahmf8sULrQ",
+  iphone13:
+    PUBLIC +
+    "AB6AXuAjYsiAS_eapqCE9fazpfOi-ptyAP7e2aorAuzml7BVkSWFXIrl94KVU-7kv9J6cVMY58LmegMrg7oauZCxmzzNrafDKlUgn08Vei5iiLRzttL-dhaPG-UgKxq6CM44oGPWpkBTDSrcEKvUXiocrtLoafqGYHh2TBo0D4YDAewm2BMmy-dgRsBoOLq5KN3JCIkrxMXuf1tYwt7Dko7ri5w0qNcRu3J6dwsEiNaWNEmOU8Epsh67IKc",
+  iphone15ProCart:
+    PUBLIC +
+    "AB6AXuAEwHE8aCohLOAxZDC6C4bJnZkAuIqoCyItGnh_egAXRq9wLFOq7-nv7QBMM9bpmGZt8_UsJiTMf6za7aKAK7xoIzq9wy0MYijxV-_At49yVaW0i7AsKf1y4d3in-WY0eRYj8QcH5DfsrK0yfLi5POuyZtqJO03ZUEepjn7AyVg7eFmajWpK3lFhrCLjRcbE-DkOciQrbycxP7V6om7o__xuy0k-UT6Y19hp5Fdjp37aVvoBY7fNrI",
+  adapterUsbC:
+    PUBLIC +
+    "AB6AXuCe98FQKK-8f1Mu30G90gpDYxss-NJeeZwzvWUfDJYh6vFUVZEzvTS0HJwqLisyj9ztFoEpbwksKFvvEAXjsW85GmnKUxARLpwmcZl4Ff7HExF0jm714TSgHaAQobvg1R-VkKN5Illizo2DiosLl-Ei3SPVPnlhEtD0RdUJETNNMgs38ZJmJjimLmZeZx9qAdaud9-wHpUxNgcUpzFz1wvVQWPWvgjV-LLOS2v1ArY2vySU3ezo5q4",
+  iphone15ProFront:
+    PUBLIC +
+    "AB6AXuAlP88wA37sEWKbWweuuWQE-rkHUtQsJ8mzVktup_x_Kcqin_VtIMi2kJEqcrd4Csc-UCFk2qGlx5sszJsDk1iYvhSa9iGLtwE-BulKNkBt_HuxHuPIcoXwNB9DeNVIhyHLjEPhiniqGBll_Va9pElQSdk1Bl-s5b3vZvpb56HB31CE2eUfatRQ1oPylvsahJFvMHYVsjnnsqzCvWW4HVloXMQPn-tJFZ6_No-D0rDoAtg9macqCoQ",
+  iphone15ProEdge:
+    PUBLIC +
+    "AB6AXuAJxPfFHh1oJbMw4dmFIIXlhaA2kOuXFXrJWTwu2llt9UX24ujIb8tgxnQUHc-aZ1kt9aKPyWJNA2h8gFUwfC0XzacY742xduxOxEdCoZiGJWZyAvJyTNY_FgCGK4sAyPYuyAla4RW0N9ngEp5Eq1cz8Sr7FBGOqfDzZc9DwpJXtz-A6LUCJYnq8uyfDf-h7xNmgVarYUYALApoewEBu-Kf85YtDJLoNE0LRTBF9O16nCEjYj37IW0",
+  iphone15ProPort:
+    PUBLIC +
+    "AB6AXuBExe_JB4czDjdhhhcJFBCZhQ2miQCuOfrGHbLIXjXCLmhvWra1SFDDsx-aNX7ltvLaTy9X8nB2GA1geCbXhkw8c240WQzJ8pAhS0AqERmF2Mb-uV5KEOcoV1ZXSg2iXgH2Oo6D9DhTvy0yFM0G0yBi_DDRVVvBEhqdq1IO9sFM6uvq94nN9ttbVWcKr0VBX5djZGo41TZw6z3FuqWpvc-VyBS7DVnD2xrxDAjA9J4rNWn_qQA4oQE",
+  storeMap:
+    PUBLIC +
+    "AB6AXuAgxFF2iA4v5j5KqfXsRbbq9SKLVFX_-e3qLXkOeN_TCynlghkA_6aQ7qYjwCvFRHXauMWbltn010ilbSxf0alFU6M8hixfYenVChvlPYA5ZHwIEtRFr9saH3Wu3xEK2X8Q2E9JXsalTAg0c_aSOMmn_cyUBv6tByxtOJy5nAFYod0H5daQ6Z8E3yCpQ3u4bSLO7GlfYLHCaGbtCV2lkSVEXwKPeaK68eDCByetDQLS8ia8I3GliS8",
+  orderThumb:
+    PUBLIC +
+    "AB6AXuCLXflevIKTv_oK76eIRAQQ3CNXImdSfF_LarmuFalVseeZxMwUNVCoeTBHH2tfTx-7kmBWKLsBG9ZgBDJyZ5GpoOFMzUMyEK7GdYRYWv_dwYrTs2uMDX2U3kxfDlqtD735SRA6C0JcHfnfIv_Hb9LOPj4EA0gfAQ6bMHAppMpIy-8LmcSjiRTr6QSeg_pOp9zSocWZ3g1Rz0FMQb5iL1nOr9qi1PsWVYUbZa_5_Z4nIG0sKiz9QWw",
+  storeFront:
+    PUBLIC +
+    "AB6AXuCz30xTeI_aSIbE_oA7ljf9tPUiDVYbJTYX_ZbnruUAcms1OF4MxeNgkTZJLm8nTnoCQWRcgE1gizSagl8Fo9sK0lNVZ7mNb0YfmgTI_IqzwZ8aypSVLzZq0sKnhkVQfeq0QPbAXz2MdH8IOqn_0YucW_jX7JGKdYS6LThTg4A7Jq4Veq-Nt_D8IRtz4di1m3pOGJg0j0QjoNgg8RT-VxoMSwsPWYSDpPttj9LHIRy45fkoJ0Ir7zs",
+} as const;
