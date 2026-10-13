@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BackHeader } from "@/components/BackHeader";
+import { BottomNav } from "@/components/BottomNav";
 import { ProductDetail } from "@/components/ProductDetail";
 import { allProducts, getProduct } from "@/lib/catalog";
 
@@ -30,11 +31,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <>
       <BackHeader title="Detalle De Producto" />
-      <main className="flex flex-col relative w-full pt-16 bg-surface flex-grow">
+      <main className="flex flex-col relative w-full pt-16 pb-24 bg-surface flex-grow">
         <div className="flex flex-col w-full pb-safe">
           <ProductDetail product={product} />
         </div>
       </main>
+      <BottomNav />
     </>
   );
 }

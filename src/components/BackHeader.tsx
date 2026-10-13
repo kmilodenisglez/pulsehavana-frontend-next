@@ -1,12 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/lib/cart";
 import { useFeatureFlags } from "@/lib/feature-flags";
 import { BrandLogo } from "./BrandLogo";
 import { Icon } from "./Icon";
 
 export function BackHeader({ title }: { title: string }) {
   const router = useRouter();
+  const { count } = useCart();
   const { showUserShortcuts } = useFeatureFlags();
 
   return (
@@ -26,13 +29,26 @@ export function BackHeader({ title }: { title: string }) {
             {title}
           </h1>
         </div>
-        {showUserShortcuts ? (
-          <div className="flex items-center gap-space-xs shrink-0">
+
+        <div className="flex items-center gap-space-xs shrink-0">
+          <Link
+            aria-label="Bolsa de compras"
+            href="/checkout"
+            className="w-11 h-11 relative rounded-full flex items-center justify-center text-ink-primary active:scale-[0.97] transition-transform duration-100"
+          >
+            <Icon name="shopping_bag" className="text-[22px]" />
+            {count > 0 ? (
+              <span className="absolute top-2 right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary-container text-on-primary font-label-compact text-[10px] leading-none flex items-center justify-center pointer-events-none">
+                {count}
+              </span>
+            ) : null}
+          </Link>
+          {showUserShortcuts ? (
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
               <Icon name="person" className="text-on-primary text-[18px]" />
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </header>
   );
