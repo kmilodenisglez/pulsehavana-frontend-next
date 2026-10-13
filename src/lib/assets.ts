@@ -1,10 +1,8 @@
 /** Design media hosted on Google's AIDA CDN. */
 const PUBLIC = "https://lh3.googleusercontent.com/aida-public/";
-const BLOB = "https://lh3.googleusercontent.com/aida/";
 
-export const logoUrl =
-  BLOB +
-  "AEtjO1X1yhBPDNN2w5UHBIgQlIy1Q9XHorlnt-6tX4TnjCSN1VNYIjIvmjMPkWhgr8ny_XPRAJTwjYarT6SbpKa2UKHjVFoVdyPFl0Pmb9RBy8OWD9J5nzdPfNuWQYqr0K2nVLWN7Qqr0yenDqm0Nmif8RXptCUx_2cfSGIarvn2fcxM1lxvfqpQBSjXMFpXBqMNxZTgJ81hFCtVHEaJXDQUrpc4L_6mlx2m4et6UepDGdJ36_mzS-zmqjSc";
+/** Local brand logo, processed from the original 6000x6000 master. */
+export const logoUrl = "/brand/pulse-havana-logo.webp";
 
 export const productImages = {
   iphone15ProMax:

@@ -7,7 +7,7 @@ export function BrandLogo({ className = "" }: { className?: string }) {
       src={logoUrl}
       alt="Pulse Havana Logo"
       width={128}
-      height={32}
+      height={128}
       unoptimized
       className={`h-8 w-auto object-contain shrink-0 ${className}`}
     />
