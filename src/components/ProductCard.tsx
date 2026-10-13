@@ -58,7 +58,6 @@ export function ProductCard({ product }: { product: Product }) {
               src={product.image}
               alt={product.name}
               fill
-              unoptimized
               sizes="(max-width: 640px) 45vw, 240px"
               className={`object-cover ${outOfStock ? "grayscale-[30%]" : ""}`}
             />

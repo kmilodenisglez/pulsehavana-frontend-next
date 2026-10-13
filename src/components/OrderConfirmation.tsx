@@ -123,8 +123,6 @@ export function OrderConfirmation() {
                     alt={line.name}
                     width={56}
                     height={56}
-                    quality={100}
-                    unoptimized
                     className="w-14 h-14 rounded-lg object-cover bg-surface-container"
                   />
                   <div className="flex flex-col flex-1 min-w-0">
@@ -251,7 +249,6 @@ export function OrderConfirmation() {
               src={productImages.storeFront}
               alt="Interior de la tienda Pulse Havana Center Cell"
               fill
-              unoptimized
               sizes="(max-width: 640px) 100vw, 640px"
               className="object-cover"
             />

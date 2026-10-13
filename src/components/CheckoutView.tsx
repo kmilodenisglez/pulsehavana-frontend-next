@@ -126,8 +126,6 @@ export function CheckoutView() {
                     src={line.image}
                     alt={line.name}
                     fill
-                    quality={100}
-                    unoptimized
                     sizes="80px"
                     className="object-cover"
                   />

@@ -151,8 +151,6 @@ export function ProductDetail({ product }: { product: Product }) {
                 src={image.src}
                 alt={image.alt}
                 fill
-                quality={100}
-                unoptimized
                 sizes="(max-width: 640px) 100vw, 640px"
                 className="object-cover"
               />
