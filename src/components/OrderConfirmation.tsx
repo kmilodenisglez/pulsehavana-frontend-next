@@ -286,7 +286,7 @@ export function OrderConfirmation() {
                   Teléfono de Soporte
                 </p>
                 <p className="font-caption text-caption text-ink-secondary">
-                  +53 7 832 9000 / +53 5 555 5555
+                  +53 59352209
                 </p>
               </div>
             </div>

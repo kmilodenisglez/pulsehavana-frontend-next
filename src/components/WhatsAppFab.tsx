@@ -1,6 +1,7 @@
 import { Icon } from "./Icon";
 
-const WHATSAPP_URL = "https://wa.me/5355555555";
+const WHATSAPP_NUMBER = "+5359352209";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER.replace(/\D/g, "")}`;
 
 export function WhatsAppFab() {
   return (

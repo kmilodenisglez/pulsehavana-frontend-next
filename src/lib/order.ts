@@ -86,6 +86,7 @@ export function buildWhatsAppMessage(order: Order): string {
   ].join("\n");
 }
 
-export function buildWhatsAppUrl(order: Order, phone = "5355555555"): string {
-  return `https://wa.me/${phone}?text=${encodeURIComponent(buildWhatsAppMessage(order))}`;
+export function buildWhatsAppUrl(order: Order, phone = "+5359352209"): string {
+  const normalizedPhone = phone.replace(/\D/g, "");
+  return `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(buildWhatsAppMessage(order))}`;
 }
