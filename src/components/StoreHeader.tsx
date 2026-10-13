@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { featureFlags } from "@/lib/feature-flags";
+import { useCart } from "@/lib/cart";
 import { BrandLogo } from "./BrandLogo";
 import { Icon } from "./Icon";
-import { useCart } from "@/lib/cart";
 
 export function StoreHeader() {
   const { count } = useCart();
+  const showUserShortcuts = featureFlags.showUserShortcuts;
 
   return (
     <header className="fixed top-0 w-full z-50 pt-safe bg-chrome-translucent backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
@@ -42,9 +44,11 @@ export function StoreHeader() {
               </span>
             ) : null}
           </Link>
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 ml-space-xs">
-            <Icon name="person" className="text-on-primary text-[18px]" />
-          </div>
+          {showUserShortcuts ? (
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 ml-space-xs">
+              <Icon name="person" className="text-on-primary text-[18px]" />
+            </div>
+          ) : null}
         </div>
       </div>
     </header>

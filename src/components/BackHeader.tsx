@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { featureFlags } from "@/lib/feature-flags";
 import { BrandLogo } from "./BrandLogo";
 import { Icon } from "./Icon";
 
 export function BackHeader({ title }: { title: string }) {
   const router = useRouter();
+  const showUserShortcuts = featureFlags.showUserShortcuts;
 
   return (
     <header className="fixed top-0 w-full z-50 pt-safe bg-chrome-translucent backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
@@ -24,11 +26,13 @@ export function BackHeader({ title }: { title: string }) {
             {title}
           </h1>
         </div>
-        <div className="flex items-center gap-space-xs shrink-0">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-            <Icon name="person" className="text-on-primary text-[18px]" />
+        {showUserShortcuts ? (
+          <div className="flex items-center gap-space-xs shrink-0">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+              <Icon name="person" className="text-on-primary text-[18px]" />
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </header>
   );
