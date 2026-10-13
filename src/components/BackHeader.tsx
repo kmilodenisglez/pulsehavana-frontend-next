@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { featureFlags } from "@/lib/feature-flags";
+import { useFeatureFlags } from "@/lib/feature-flags";
 import { BrandLogo } from "./BrandLogo";
 import { Icon } from "./Icon";
 
 export function BackHeader({ title }: { title: string }) {
   const router = useRouter();
-  const showUserShortcuts = featureFlags.showUserShortcuts;
+  const { showUserShortcuts } = useFeatureFlags();
 
   return (
     <header className="fixed top-0 w-full z-50 pt-safe bg-chrome-translucent backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
