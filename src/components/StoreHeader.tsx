@@ -17,7 +17,7 @@ export function StoreHeader() {
           <BrandLogo />
           <div className="flex flex-col min-w-0">
             <span className="font-headline text-headline text-ink-primary leading-none truncate tracking-tight">
-              Pulse Havana
+              Pulse Havana Center Cell
             </span>
             <span className="font-caption text-caption text-ink-secondary truncate leading-none mt-0.5">
               Inicio
