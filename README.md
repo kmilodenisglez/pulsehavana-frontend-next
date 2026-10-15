@@ -43,6 +43,15 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/checkout    # 200
 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/confirmation # 200
 ```
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main`/`dev` and on every pull request:
+
+| Job | Steps |
+| --- | --- |
+| **Lint & design tokens** | `npm run lint`, `npm run tokens:check` |
+| **Production build** | `npm run build` (also type-checks) |
+
 ## Routes
 
 | Route | Screen | Notes |
