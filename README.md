@@ -65,13 +65,21 @@ Deployed on Netlify through the repository's Git integration. Next.js runs on Ne
 - Netlify fully supports the `cacheComponents` and Turbopack features enabled in `next.config.ts`.
 - Optional hardening: enable **skew protection** by setting `NETLIFY_NEXT_SKEW_PROTECTION=true` in the site's environment variables.
 
-### VPS + Django backend (planned)
+### VPS + Django backend (prepared, inactive)
 
-When the frontend moves next to the Django backend on a VPS:
+The VPS pipeline is already in the repo but **inert on purpose** — GitHub only runs
+workflow files ending in `.yml`/`.yaml`:
 
-- Build with `output: "standalone"` (`next.config.ts`) and run `next start` behind Nginx (reverse proxy + TLS), with Nginx serving `/_next/static` and the app icons.
-- Point the app at the Django API through an environment variable.
-- Deploy via a GitHub Actions job (build + SSH/rsync) instead of Netlify's Git integration. `.github/workflows/ci.yml` already guarantees the build is green first.
+- `Containerfile` — multi-stage production image running `next start`.
+- `.github/workflows/deploy-vps.yml.disabled` — build → push to GHCR → SSH deploy.
+- `deploy/nginx.conf` — Nginx reverse proxy (TLS via certbot).
+- `deploy/pulsehavana-frontend.container` — Podman Quadlet (systemd) unit.
+- `deploy/rollback.sh` — roll the container to a previous image tag.
+- `deploy/README.md` — secrets, one-time server setup and activation steps.
+
+To activate: create the secrets/variables and rename the workflow file to
+`deploy-vps.yml`. A local `podman build`/run of this image was verified (200 on `/`,
+`/checkout`, `/product/iphone-14`, `/icon.png`).
 
 ## Routes
 
@@ -123,6 +131,8 @@ confirmation screen falls back to the design defaults (`PHC-7842`, USD 968.00).
 DESIGN-SYSTEM.md       Brand + design-token contract (humans + AI agents)
 AGENTS.md              Agent instructions (Next.js rules + design-token rules)
 tokens.json            Generated DTCG mirror of the design tokens (do not edit)
+Containerfile          Production image (podman) for the VPS deploy
+deploy/                VPS deploy assets (nginx.conf, Quadlet unit, rollback.sh, README)
 src/
   app/                 App Router routes + globals.css (design tokens) + layout.tsx
     fonts/             Self-hosted Material Symbols (next/font/local)
