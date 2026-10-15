@@ -99,7 +99,7 @@ export function StoreCatalog() {
                 <Icon name={"account_tree"} className="text-[16px] text-primary-container" />
                 <span className="font-label-compact text-[11px] text-ink-primary font-bold uppercase tracking-wider">
                   Subcategorías de
-                  <span className="text-primary-container" id="currentParentLabel">
+                  <span className="ml-1 text-primary-container" id="currentParentLabel">
                     {parentLabel}
                   </span>
                 </span>
