@@ -1,14 +1,10 @@
 import Link from "next/link";
+import { Icon } from "@/components/Icon";
 
 export default function NotFound() {
   return (
     <main className="flex flex-col items-center justify-center gap-4 flex-grow px-margin py-space-3xl text-center">
-      <span
-        aria-hidden="true"
-        className="material-symbols-outlined text-[48px] text-primary-container"
-      >
-        search_off
-      </span>
+      <Icon name={"search_off"} className="text-[48px] text-primary-container" />
       <h1 className="font-title text-title text-ink-primary tracking-tight">No encontramos esto</h1>
       <p className="font-body text-body text-ink-secondary max-w-xs">
         El equipo o la página que buscas no está disponible en este momento.

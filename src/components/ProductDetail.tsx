@@ -3,20 +3,10 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { Icon } from "./Icon";
+import { badgeTintTone } from "@/lib/badges";
 import { useCart } from "@/lib/cart";
 import { formatAmount, usd } from "@/lib/format";
-import type { BadgeKind, Product } from "@/lib/types";
-
-function detailBadgeTone(kind: BadgeKind): string {
-  switch (kind) {
-    case "primary":
-      return "bg-primary-tint text-primary";
-    case "success":
-      return "bg-status-success/10 text-status-success";
-    default:
-      return "bg-surface-container-highest text-ink-secondary";
-  }
-}
+import type { Product } from "@/lib/types";
 
 function storageGridClass(count: number): string {
   if (count <= 1) return "grid-cols-1";
@@ -80,13 +70,11 @@ export function ProductDetail({ product }: { product: Product }) {
         {product.detailBadges.map((badge) => (
           <div
             key={badge.label}
-            className={`inline-flex items-center ${badge.dot ? "gap-1.5" : badge.icon ? "gap-1" : ""} px-3 py-1 rounded-full font-label-compact text-label-compact ${detailBadgeTone(
+            className={`inline-flex items-center ${badge.dot ? "gap-1.5" : badge.icon ? "gap-1" : ""} px-3 py-1 rounded-full font-label-compact text-label-compact ${badgeTintTone(
               badge.kind,
             )}`}
           >
-            {badge.dot ? (
-              <span className="w-1.5 h-1.5 rounded-full bg-status-success" />
-            ) : null}
+            {badge.dot ? <span className="w-1.5 h-1.5 rounded-full bg-current" /> : null}
             {badge.icon ? (
               <Icon name={badge.icon} className="text-[14px]" filled={badge.iconFilled} />
             ) : null}

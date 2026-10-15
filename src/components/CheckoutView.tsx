@@ -84,7 +84,6 @@ export function CheckoutView() {
           <h2 className="font-title text-title text-ink-primary tracking-tight">Tu Pedido</h2>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-tint text-primary font-caption text-caption font-medium">
             <Icon name="bolt" className="text-[16px]" />
-            <span>Exprés · Sin contraseñas</span>
           </div>
         </div>
         <p className="font-body text-body text-ink-secondary">

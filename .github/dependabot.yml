@@ -1,0 +1,43 @@
+version: 2
+
+updates:
+  # Application dependencies (Next.js, React, Tailwind, tooling).
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Havana
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    labels:
+      - dependencies
+    groups:
+      # One PR per week for routine production bumps (next, react, …).
+      production-minor-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+      # One PR per week for routine dev-tooling bumps (eslint, types, …).
+      development-minor-patch:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  # Keep the GitHub Actions used by CI up to date.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Havana
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - dependencies

@@ -1,0 +1,53 @@
+# ============================================================================
+#  Podman Quadlet unit — Pulse Havana Center Cell frontend (Next.js)
+#
+#  Install (rootless, recommended):
+#    cp deploy/pulsehavana-frontend.container \
+#       ~/.config/containers/systemd/pulsehavana-frontend.container
+#    systemctl --user daemon-reload
+#    systemctl --user start pulsehavana-frontend.service
+#
+#  Install (rootful):
+#    sudo cp deploy/pulsehavana-frontend.container /etc/containers/systemd/
+#    sudo systemctl daemon-reload && sudo systemctl start pulsehavana-frontend
+#    (and change [Install] WantedBy= to multi-user.target)
+#
+#  The CI deploy overrides `Image=` through a drop-in so every release is pinned
+#  to an immutable commit tag:
+#    ~/.config/containers/systemd/pulsehavana-frontend.container.d/10-image.conf
+# ============================================================================
+
+[Unit]
+Description=Pulse Havana Center Cell - frontend (Next.js)
+Documentation=https://github.com/kmilodenisglez/pulsehavana-frontend-next
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+# Default image; the CI deploy replaces this via the drop-in above.
+Image=ghcr.io/kmilodenisglez/pulsehavana-frontend-next:latest
+ContainerName=pulsehavana-frontend
+
+# Only exposed to the host loopback; Nginx terminates TLS and proxies here.
+PublishPort=127.0.0.1:3000:3000
+
+# Let `podman auto-update` (timer) pull new digests automatically.
+AutoUpdate=registry
+
+# Container health check against the Next.js server.
+HealthCmd=curl -fsS -o /dev/null http://127.0.0.1:3000/
+HealthInterval=30s
+HealthTimeout=5s
+HealthRetries=3
+HealthStartPeriod=15s
+
+# Runtime (server-side only) configuration, e.g. the Django API URL.
+# Public NEXT_PUBLIC_* values must be baked at build time instead.
+# EnvironmentFile=%h/.config/pulsehavana/frontend.env
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

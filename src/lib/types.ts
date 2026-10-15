@@ -1,9 +1,11 @@
 export type CategoryId =
   | "todos"
+  | "telefonos"
+  | "energia"
+  | "accesorios"
   | "apple-iphone"
   | "samsung-galaxy"
   | "xiaomi"
-  | "accesorios"
   | "panel-solar"
   | "estacion-energia";
 
@@ -76,6 +78,7 @@ export interface Product {
   /** Condition label used in cart subtitles, e.g. "Libre de Fábrica". */
   condition: string;
   colorLabel: string;
+  subcategory_name?: string;
   description: string;
   gallery: ProductImage[];
   colors: ProductColor[];

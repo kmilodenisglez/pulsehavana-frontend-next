@@ -1,0 +1,10 @@
+# Keep the build context small (used by `podman build` and Docker BuildKit).
+node_modules
+.next
+.git
+.github
+data_tmp
+.gitignore
+*.md
+npm-debug.log*
+.DS_Store

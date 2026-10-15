@@ -1,0 +1,89 @@
+# ============================================================================
+#  Prune workflow runs — keeps only the newest N runs of each workflow.
+#
+#  GitHub has no built-in "keep last N runs" setting (only log/artifact
+#  retention in days), so this scheduled job lists every workflow's runs and
+#  deletes all but the newest `keep` ones through the REST API.
+#
+#  Notes:
+#   - Deleting a run also deletes its logs and artifacts.
+#   - Only *completed* runs are touched, so the run currently executing (and any
+#     queued/in-progress run) is never deleted.
+#   - Do not set `keep` to 0: that would delete every completed run.
+# ============================================================================
+
+name: Prune workflow runs
+
+on:
+  # Run every day at 03:17 UTC (off-peak, avoids the top-of-the-hour rush).
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      keep:
+        description: Number of runs to keep per workflow
+        type: number
+        required: false
+        default: 4
+      dry_run:
+        description: Only list what would be deleted
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  actions: write # required to delete workflow runs
+  contents: read
+
+concurrency:
+  group: prune-runs
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    name: Delete old runs
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      KEEP: ${{ inputs.keep || 4 }}
+      DRY_RUN: ${{ inputs.dry_run || false }}
+    steps:
+      - name: Prune all but the newest runs of each workflow
+        run: |
+          set -euo pipefail
+          echo "Keeping the newest ${KEEP} run(s) per workflow in ${REPO} (dry_run=${DRY_RUN})"
+
+          mapfile -t workflow_ids < <(
+            gh api "repos/${REPO}/actions/workflows" --paginate --jq '.workflows[].id'
+          )
+
+          deleted=0
+          kept=0
+          for wf in "${workflow_ids[@]}"; do
+            # The API returns runs newest-first, so the first KEEP are the ones we keep.
+            mapfile -t run_ids < <(
+              gh api "repos/${REPO}/actions/workflows/${wf}/runs?per_page=100" --paginate \
+                --jq '.workflow_runs[] | select(.status == "completed") | .id'
+            )
+            total=${#run_ids[@]}
+
+            if (( total <= KEEP )); then
+              echo "workflow ${wf}: ${total} completed run(s) — nothing to delete"
+              kept=$((kept + total))
+              continue
+            fi
+
+            for (( i = KEEP; i < total; i++ )); do
+              if [[ "${DRY_RUN}" == "true" ]]; then
+                echo "would delete run ${run_ids[$i]} (workflow ${wf})"
+              else
+                gh api -X DELETE "repos/${REPO}/actions/runs/${run_ids[$i]}" >/dev/null
+                echo "deleted run ${run_ids[$i]} (workflow ${wf})"
+              fi
+              deleted=$((deleted + 1))
+            done
+            kept=$((kept + KEEP))
+          done
+
+          echo "::notice::Done — kept ${kept} run(s), pruned ${deleted} run(s)."
