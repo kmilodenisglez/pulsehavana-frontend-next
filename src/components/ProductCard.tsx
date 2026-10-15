@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "./Icon";
 import { useCart } from "@/lib/cart";
-import { formatCompact, usd } from "@/lib/format";
+import { formatCompact } from "@/lib/format";
 import type { BadgeKind, Product } from "@/lib/types";
 
 function badgeTone(kind: BadgeKind): string {

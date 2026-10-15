@@ -4,7 +4,7 @@
  * To switch to real backend: replace import in StoreCatalog.tsx
  * and change the fetch URLs from /api/v1/ to the real endpoint.
  */
-import type { Category, CategoryId, Product, StockStatus, BadgeKind } from "./types";
+import type { Category, Product } from "./types";
 
 /** Base URL for images (same as real catalog) */
 const PUBLIC = "https://lh3.googleusercontent.com/aida-public";
@@ -661,8 +661,8 @@ export const mockProductsByFilter = {
   ],
 };
 
-/** Get categories tree (mimics /api/v1/categories/) */
-export function useMockCategories(): Category[] {
+/** Get categories tree (mimics /api/v1/categories/). Plain function, not a hook. */
+export function getMockCategories(): Category[] {
   // Transform mockCategoriesTree to Category[] format
   const result: Category[] = [
     { id: "todos", label: "Todos" },
@@ -673,8 +673,8 @@ export function useMockCategories(): Category[] {
   return result;
 }
 
-/** Get subcategories for a category (mimics /api/v1/categories/{slug}/subcategories/) */
-export function useMockSubcategories(categorySlug: string) {
+/** Get subcategories for a category (mimics /api/v1/categories/{slug}/subcategories/). Plain function, not a hook. */
+export function getMockSubcategories(categorySlug: string) {
   const category = mockCategoriesTree.find((c) => c.slug === categorySlug);
   if (!category) return [];
 
@@ -700,8 +700,47 @@ export function useMockSubcategories(categorySlug: string) {
   });
 }
 
-/** Get products with filters (mimics /api/v1/products/) */
-export function useMockProducts(filters: {
+/**
+ * Defensive normalization: the list serializer omits variant/detail data, so
+ * consumers (cards *and* the product detail view) always receive at least one
+ * color, one storage and one gallery image to render.
+ */
+export function normalizeMockProduct(p: Product): Product {
+  return {
+    ...p,
+    colors:
+      p.colors && p.colors.length
+        ? p.colors
+        : [{ name: p.colorLabel || "Default", hex: "#4F46E5" }],
+    storages:
+      p.storages && p.storages.length
+        ? p.storages
+        : [{ label: "Default", price: p.price }],
+    gallery:
+      p.gallery && p.gallery.length
+        ? p.gallery
+        : [{ src: p.image, alt: p.name, label: "Producto" }],
+  };
+}
+
+/**
+ * Resolve a single product by slug from the mock catalog.
+ * Used by the product detail route so it stays in sync with the grid, which is
+ * also fed by `mockProductsByFilter`.
+ */
+export function getMockProductBySlug(slug: string): Product | undefined {
+  const raw = mockProductsByFilter.todos.find((p) => p.slug === slug);
+  if (!raw) return undefined;
+  return normalizeMockProduct(raw as Product);
+}
+
+/** All slugs available in the mock catalog (for static params / sitemap use). */
+export function getMockProductSlugs(): string[] {
+  return mockProductsByFilter.todos.map((p) => p.slug);
+}
+
+/** Get products with filters (mimics /api/v1/products/). Plain function, not a hook. */
+export function getMockProducts(filters: {
   category_slug?: string;
   subcategory_slug?: string;
   min_price?: number;
@@ -747,19 +786,8 @@ export function useMockProducts(filters: {
   // Sort by name default
   products.sort((a, b) => a.name.localeCompare(b.name));
 
-  // Defensive: ensure returned products always have at least one color and one storage
-  const normalized = products.map((p) => ({
-    // keep original shape
-    ...p,
-    colors:
-      p.colors && p.colors.length
-        ? p.colors
-        : [{ name: p.colorLabel || "Default", hex: "#4F46E5" }],
-    storages:
-      p.storages && p.storages.length
-        ? p.storages
-        : [{ label: "Default", price: p.price }],
-  }));
+  // Defensive: ensure returned products always have at least one color, one storage and one image
+  const normalized = products.map(normalizeMockProduct);
 
   return {
     data: normalized,

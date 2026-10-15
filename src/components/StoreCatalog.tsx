@@ -1,136 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Icon } from "./Icon";
 import { ProductCard } from "./ProductCard";
-import { pluralize } from "@/lib/format";
-import type { Category, Product } from "@/lib/types";
-import { useMockCategories, useMockSubcategories, useMockProducts } from "@/lib/mockApi";
+import type { Category } from "@/lib/types";
+import { getMockCategories, getMockProducts, getMockSubcategories } from "@/lib/mockApi";
 
 // --- Mock configuration ---
-// Set initial mock active category (use 'todos' to show all)
+// Initial active category ('todos' shows the full catalog).
 const MOCK_ACTIVE_CATEGORY: Category["id"] = "todos";
 
+// Human-readable labels for the parent categories.
+const CATEGORY_LABELS: Record<Category["id"], string> = {
+  todos: "Todos",
+  telefonos: "Teléfonos",
+  energia: "Energía & Respaldo",
+  accesorios: "Audio & Accesorios",
+  "apple-iphone": "Apple iPhone",
+  "samsung-galaxy": "Samsung Galaxy",
+  xiaomi: "Xiaomi",
+  "panel-solar": "Panel Solar",
+  "estacion-energia": "Estación de Energía",
+};
+
 export function StoreCatalog() {
-  // State initialization: use mock mode or null for real API
-  const [activeCategory, setActiveCategory] = useState<Category["id"] | null>(MOCK_ACTIVE_CATEGORY);
+  const [activeCategory, setActiveCategory] = useState<Category["id"]>(MOCK_ACTIVE_CATEGORY);
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
-  const [activePath, setActivePath] = useState<string>("Todos");
-  const [productCount, setProductCount] = useState(0);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
 
-  // --- Category tree from mock API (or real backend) ---
-  useEffect(() => {
-    const catTree = useMockCategories();
-    setCategories(catTree);
-  }, []);
+  // The mock data layer is synchronous, so every derived value is computed
+  // during render. Keeping this out of effects means the server and client
+  // render identical markup (no hydration mismatch, no empty-state flash).
+  const categories = useMemo(() => getMockCategories(), []);
 
-  // Subcategories from mock API (or real backend fetch)
-  useEffect(() => {
-    if (activeCategory) {
-      const subs = useMockSubcategories(activeCategory);
-      // We don't set state here directly - useMockSubcategories is used inline
-      // when rendering the pills. This keeps it simple for mock mode.
-    }
-  }, [activeCategory]);
+  const products = useMemo(
+    () =>
+      getMockProducts({
+        category_slug: activeCategory === "todos" ? undefined : activeCategory,
+        subcategory_slug: activeSubcategory ?? undefined,
+      }).data,
+    [activeCategory, activeSubcategory],
+  );
 
-  // Products from mock API (or real backend fetch)
-  useEffect(() => {
-    const catFilter = activeCategory === "todos" ? undefined : (activeCategory as string | undefined);
-    const { data: fetchedProducts, meta } = useMockProducts({
-      category_slug: catFilter,
-      subcategory_slug: activeSubcategory as string | undefined,
-    });
-    setProducts(fetchedProducts);
-    setProductCount(meta.total_items || 0);
-  }, [activeCategory, activeSubcategory]);
+  const subcategories = useMemo(
+    () => (activeCategory === "todos" ? [] : getMockSubcategories(activeCategory)),
+    [activeCategory],
+  );
 
-  // --- Category labels for display ---
-  const categoryLabels: Record<string, string> = {
-    telefonos: "Teléfonos",
-    energia: "Energía & Respaldo",
-    accesorios: "Audio & Accesorios",
-    todos: "Todos",
-  };
+  const parentLabel = CATEGORY_LABELS[activeCategory];
+  const activeSub = subcategories.find((sub) => sub.slug === activeSubcategory) ?? null;
 
-  // Render subcategory pills
-  const renderSubcategoryPills = () => {
-    if (!activeCategory || activeCategory === "todos") return null;
-
-    const subs = useMockSubcategories(activeCategory);
-    if (!subs) return null;
-
-    return (
-      <div className="bg-surface-container-low/70 border border-border-hairline rounded-[20px] p-3 flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <Icon name={"account_tree"} className="text-[16px] text-primary-container" />
-            <span className="font-label-compact text-[11px] text-ink-primary font-bold uppercase tracking-wider">
-              Subcategorías de
-              <span className="text-primary-container" id="currentParentLabel">
-                {categoryLabels[activeCategory as keyof Record<Category["id"], string>]}
-              </span>
-            </span>
-          </div>
-          <span className="font-label-compact text-[11px] text-ink-secondary font-medium" id="subcategorySummary">
-            {activeCategory === "telefonos" ? "4 marcas disponibles" : "3 subcategorías"}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar py-0.5" id="subcategoriesContainer">
-          {subs.map((sub, index) => {
-            const isActive = activeSubcategory === sub.slug;
-            const pillClass = isActive
-              ? "subcat-pill active flex items-center gap-2 h-9 px-3 rounded-full bg-primary-container text-on-primary font-callout text-xs font-semibold whitespace-nowrap shadow-sm active:scale-[0.97] transition-all"
-              : "subcat-pill flex items-center gap-2 h-9 px-3 rounded-full bg-surface-base border border-border-hairline text-ink-primary font-callout text-xs font-semibold whitespace-nowrap active:scale-[0.97] transition-all";
-
-            return (
-              <button
-                key={sub.name}
-                className={pillClass}
-                onClick={() => {
-                  setActiveSubcategory(sub.slug);
-                  setActivePath(
-                    `${categoryLabels[activeCategory as keyof Record<Category["id"], string>]} → ${sub.name} (` + sub.count + ` productos sincronizados)`
-                  );
-                }}
-              >
-                <Icon
-                  name={sub.icon}
-                  className={isActive ? "text-[16px] text-on-primary" : "text-[16px] text-ink-secondary"}
-                />
-                <span>{sub.name}</span>
-                <span className={isActive ? "px-1.5 py-0.2 bg-white/20 rounded-full font-label-compact text-[10px] leading-tight font-bold text-on-primary" : "px-1.5 py-0.2 bg-surface-container-high text-ink-secondary rounded-full font-label-compact text-[10px] leading-tight font-bold"}>
-                  {sub.count} disp.
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // --- Product grid rendering ---
-  const renderProductsGrid = () => {
-    if (productCount === 0) {
-      return (
-        <div className="col-span-full pt-8 text-center">
-          <Icon name={"inventory_2"} className="text-[48px] text-primary-container" />
-          <p className="font-callout text-callout text-ink-primary mt-2">Sin equipos en esta categoría</p>
-          <p className="font-caption text-caption text-ink-secondary">Escríbenos por WhatsApp y te avisamos cuando llegue nuevo stock.</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid grid-cols-2 gap-3 mt-space-xs sm:grid-cols-3 lg:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
-      </div>
-    );
-  };
+  const breadcrumb = activeSub
+    ? `${parentLabel} → ${activeSub.name} (${activeSub.count} productos sincronizados)`
+    : parentLabel;
 
   return (
     <>
@@ -147,7 +68,6 @@ export function StoreCatalog() {
                 onClick={() => {
                   setActiveCategory(category.id);
                   setActiveSubcategory(null);
-                  setActivePath(category.label);
                 }}
                 className={`flex items-center justify-center h-10 px-5 rounded-full font-callout text-sm font-semibold whitespace-nowrap active:scale-[0.97] transition-all duration-100 ${
                   isActive
@@ -163,9 +83,61 @@ export function StoreCatalog() {
       </section>
 
       {/* Level 2: Subcategorías Dinámicas */}
-      {activeCategory && activeCategory !== "todos" && (
+      {activeCategory !== "todos" && subcategories.length > 0 && (
         <section className="px-margin pt-1">
-          {renderSubcategoryPills()}
+          <div className="bg-surface-container-low/70 border border-border-hairline rounded-[20px] p-3 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Icon name={"account_tree"} className="text-[16px] text-primary-container" />
+                <span className="font-label-compact text-[11px] text-ink-primary font-bold uppercase tracking-wider">
+                  Subcategorías de
+                  <span className="text-primary-container" id="currentParentLabel">
+                    {parentLabel}
+                  </span>
+                </span>
+              </div>
+              <span
+                className="font-label-compact text-[11px] text-ink-secondary font-medium"
+                id="subcategorySummary"
+              >
+                {activeCategory === "telefonos" ? "4 marcas disponibles" : "3 subcategorías"}
+              </span>
+            </div>
+            <div
+              className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar py-0.5"
+              id="subcategoriesContainer"
+            >
+              {subcategories.map((sub) => {
+                const isActive = activeSubcategory === sub.slug;
+                const pillClass = isActive
+                  ? "subcat-pill active flex items-center gap-2 h-9 px-3 rounded-full bg-primary-container text-on-primary font-callout text-xs font-semibold whitespace-nowrap shadow-sm active:scale-[0.97] transition-all"
+                  : "subcat-pill flex items-center gap-2 h-9 px-3 rounded-full bg-surface-base border border-border-hairline text-ink-primary font-callout text-xs font-semibold whitespace-nowrap active:scale-[0.97] transition-all";
+
+                return (
+                  <button
+                    key={sub.slug}
+                    className={pillClass}
+                    onClick={() => setActiveSubcategory(sub.slug)}
+                  >
+                    <Icon
+                      name={sub.icon}
+                      className={isActive ? "text-[16px] text-on-primary" : "text-[16px] text-ink-secondary"}
+                    />
+                    <span>{sub.name}</span>
+                    <span
+                      className={
+                        isActive
+                          ? "px-1.5 py-0.2 bg-white/20 rounded-full font-label-compact text-[10px] leading-tight font-bold text-on-primary"
+                          : "px-1.5 py-0.2 bg-surface-container-high text-ink-secondary rounded-full font-label-compact text-[10px] leading-tight font-bold"
+                      }
+                    >
+                      {sub.count} disp.
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </section>
       )}
 
@@ -175,9 +147,14 @@ export function StoreCatalog() {
           <div className="flex items-center gap-1.5 min-w-0">
             <Icon name={"filter_alt"} className="text-[18px] text-primary-container shrink-0" />
             <div className="flex flex-col min-w-0">
-              <span className="font-callout text-[13px] font-semibold text-ink-primary truncate" id="activeFilterBreadcrumb">{activePath}</span>
+              <span
+                className="font-callout text-[13px] font-semibold text-ink-primary truncate"
+                id="activeFilterBreadcrumb"
+              >
+                {breadcrumb}
+              </span>
               <span className="font-caption text-[11px] text-ink-secondary leading-none">
-                {productCount} productos sincronizados
+                {products.length} productos sincronizados
               </span>
             </div>
           </div>
@@ -201,10 +178,27 @@ export function StoreCatalog() {
             Resultados de Catálogo
           </h2>
           <span className="font-caption text-caption text-ink-secondary font-medium">
-            {productCount} modelos en local
+            {products.length} modelos en local
           </span>
         </div>
-        {renderProductsGrid()}
+
+        {products.length === 0 ? (
+          <div className="col-span-full pt-8 text-center">
+            <Icon name={"inventory_2"} className="text-[48px] text-primary-container" />
+            <p className="font-callout text-callout text-ink-primary mt-2">
+              Sin equipos en esta categoría
+            </p>
+            <p className="font-caption text-caption text-ink-secondary">
+              Escríbenos por WhatsApp y te avisamos cuando llegue nuevo stock.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 mt-space-xs sm:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product.slug} product={product} />
+            ))}
+          </div>
+        )}
       </section>
     </>
   );
