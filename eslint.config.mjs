@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Project references / tooling (not app code):
     ".opencode/**",
+    ".github/**",
     "data_tmp/**",
   ]),
 ]);
