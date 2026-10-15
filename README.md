@@ -24,6 +24,8 @@ npm install
 | `npm run build` | Create the production build (`.next/`) |
 | `npm run start` | Serve the production build (run `npm run build` first) |
 | `npm run lint` | Run ESLint (expected: **0 problems**) |
+| `npm run tokens:export` | Regenerate `tokens.json` from `globals.css` (`@theme`) |
+| `npm run tokens:check` | Verify `tokens.json` is up to date (use in CI) |
 
 Start the production server on a custom port:
 
@@ -88,6 +90,9 @@ confirmation screen falls back to the design defaults (`PHC-7842`, USD 968.00).
 ## Project structure
 
 ```
+DESIGN-SYSTEM.md       Brand + design-token contract (humans + AI agents)
+AGENTS.md              Agent instructions (Next.js rules + design-token rules)
+tokens.json            Generated DTCG mirror of the design tokens (do not edit)
 src/
   app/                 App Router routes + globals.css (design tokens) + layout.tsx
     fonts/             Self-hosted Material Symbols (next/font/local)
@@ -97,6 +102,7 @@ src/
   components/          UI: header, catalog, detail, checkout, confirmation, nav, FAB, icon, pill scroller
   lib/
     assets.ts          CDN image/logo URLs
+    badges.ts          Brand-aligned product badge color helpers
     catalog.ts         Products, categories, seed cart
     cart.tsx           Cart context (localStorage-backed, useSyncExternalStore)
     order.ts           Order read/write + WhatsApp helpers
@@ -104,6 +110,7 @@ src/
     types.ts           Shared types
 scripts/
   generate-app-icons.sh  Regenerates the src/app app icons from the brand logo master
+  export-design-tokens.mjs  Generates tokens.json from globals.css (@theme)
   subset-material-symbols.py
 data_tmp/              Reference designs (not part of the build)
 ```
@@ -111,7 +118,11 @@ data_tmp/              Reference designs (not part of the build)
 ## Design fidelity notes
 
 - Design tokens (colors, Inter type scale, radii, shadows, spacing) are ported from the
-  designs' Tailwind CDN config into `src/app/globals.css` (`@theme`).
+  designs' Tailwind CDN config into `src/app/globals.css` (`@theme`). A machine-readable
+  copy is generated as `tokens.json` (`npm run tokens:export`, validated by
+  `npm run tokens:check`).
+- Product badges use a brand-aligned semantic palette (purple family + neutral ink; green
+  is reserved for functional stock/status). See `DESIGN-SYSTEM.md` and `src/lib/badges.ts`.
 - Images use `<Image unoptimized />`: the designs serve the original CDN URLs in a plain
   `<img>` and let the browser scale them. Disabling the optimizer is what makes the
   rendering match 1:1.
