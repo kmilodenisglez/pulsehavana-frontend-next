@@ -5,23 +5,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "./Icon";
 import { useCart } from "@/lib/cart";
+import { badgeOverlayTone } from "@/lib/badges";
 import { formatCompact } from "@/lib/format";
 import type { BadgeKind, Product } from "@/lib/types";
-
-function badgeTone(kind: BadgeKind): string {
-  switch (kind) {
-    case "success":
-      return "bg-emerald-500/90 text-white border border-emerald-200/40 shadow-sm backdrop-blur-sm";
-    case "primary":
-      return "bg-violet-500/90 text-white border border-violet-200/40 shadow-sm backdrop-blur-sm";
-    default:
-      return "bg-slate-900/70 text-white border border-white/15 shadow-sm backdrop-blur-sm";
-  }
-}
-
-function dotTone(kind: BadgeKind): string {
-  return kind === "primary" ? "bg-white" : "bg-white";
-}
 
 export function ProductCard({ product }: { product: Product }) {
   const { addLine } = useCart();
@@ -75,12 +61,12 @@ export function ProductCard({ product }: { product: Product }) {
             <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1.5">
               <span
                 title={product.badge.label}
-                className={`inline-flex min-w-0 items-center gap-1 px-2 py-0.5 rounded-full font-label-compact text-[10px] font-semibold ${badgeTone(
+                className={`inline-flex min-w-0 items-center gap-1 px-2 py-0.5 rounded-full font-label-compact text-[10px] font-semibold ${badgeOverlayTone(
                   badgeKind,
                 )}`}
               >
                 {product.badge.dot ? (
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotTone(badgeKind)}`} />
+                  <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-current" />
                 ) : null}
                 <span className="truncate">{product.badge.label}</span>
               </span>
@@ -89,7 +75,7 @@ export function ProductCard({ product }: { product: Product }) {
                   role="img"
                   aria-label="Destacado"
                   title="Destacado"
-                  className="shrink-0 inline-flex items-center gap-1 px-1.5 @min-[190px]:px-2 py-0.5 rounded-full bg-violet-600/90 text-white border border-violet-200/40 shadow-sm font-label-compact text-[9px] font-bold tracking-wide backdrop-blur-sm"
+                  className="shrink-0 inline-flex items-center gap-1 px-1.5 @min-[190px]:px-2 py-0.5 rounded-full bg-surface-base/85 text-primary-container border border-primary-container/20 shadow-sm font-label-compact text-[9px] font-bold tracking-wide backdrop-blur-sm"
                 >
                   <Icon name="star" className="text-[11px]" filled />
                   {/* Show the label only when the card is wide enough (container query). */}

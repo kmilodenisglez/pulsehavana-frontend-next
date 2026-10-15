@@ -70,6 +70,12 @@
   --color-status-success: #047857;
   --color-status-danger: #b91c1c;
 
+  /* Product badges — Brand Book "Brand Discipline": purple family + neutral ink
+     only. Green is reserved for functional stock status, never for merch badges. */
+  --color-badge-new: #7c3aed; /* Primary  — "Nuevo" / availability */
+  --color-badge-promo: #5b21b6; /* Tertiary — promotional emphasis ("Oferta") */
+  --color-badge-neutral: #1d1d1f; /* Neutral  — grading / low-emphasis labels */
+
   /* Ink */
   --color-ink-primary: #1d1d1f;
   --color-ink-secondary: #6e6e73;
