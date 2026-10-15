@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Icon } from "./Icon";
+import { PillScroller } from "./PillScroller";
 import { ProductCard } from "./ProductCard";
 import type { Category } from "@/lib/types";
 import { getMockCategories, getMockProducts, getMockSubcategories } from "@/lib/mockApi";
@@ -57,7 +58,10 @@ export function StoreCatalog() {
     <>
       {/* Level 1: Categorías Principales */}
       <section id="categories" className="w-full py-space-sm">
-        <div className="flex items-center gap-2 overflow-x-auto px-margin md:px-margin-desktop scrollbar-none no-scrollbar py-0.5">
+        <PillScroller
+          activeKey={activeCategory}
+          className="flex items-center gap-2 overflow-x-auto px-margin md:px-margin-desktop scrollbar-none no-scrollbar py-0.5"
+        >
           {categories.map((category) => {
             const isActive = activeCategory === category.id;
             return (
@@ -65,6 +69,7 @@ export function StoreCatalog() {
                 key={category.id}
                 type="button"
                 aria-pressed={isActive}
+                data-active={isActive}
                 onClick={() => {
                   setActiveCategory(category.id);
                   setActiveSubcategory(null);
@@ -79,7 +84,7 @@ export function StoreCatalog() {
               </button>
             );
           })}
-        </div>
+        </PillScroller>
       </section>
 
       {/* Level 2: Subcategorías Dinámicas */}
@@ -103,9 +108,10 @@ export function StoreCatalog() {
                 {activeCategory === "telefonos" ? "4 marcas disponibles" : "3 subcategorías"}
               </span>
             </div>
-            <div
-              className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar py-0.5"
+            <PillScroller
+              activeKey={activeSubcategory}
               id="subcategoriesContainer"
+              className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar py-0.5"
             >
               {subcategories.map((sub) => {
                 const isActive = activeSubcategory === sub.slug;
@@ -116,6 +122,9 @@ export function StoreCatalog() {
                 return (
                   <button
                     key={sub.slug}
+                    type="button"
+                    aria-pressed={isActive}
+                    data-active={isActive}
                     className={pillClass}
                     onClick={() => setActiveSubcategory(sub.slug)}
                   >
@@ -136,7 +145,7 @@ export function StoreCatalog() {
                   </button>
                 );
               })}
-            </div>
+            </PillScroller>
           </div>
         </section>
       )}
