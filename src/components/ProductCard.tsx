@@ -23,36 +23,6 @@ function dotTone(kind: BadgeKind): string {
   return kind === "primary" ? "bg-white" : "bg-white";
 }
 
-function getProductImageBadgeTone(product: Product): string {
-  const combined = `${product.name} ${product.subcategory_name ?? ""} ${product.shortSpec ?? ""} ${product.colorLabel ?? ""}`.toLowerCase();
-  const darkHints = [
-    "negro",
-    "black",
-    "obsidiana",
-    "grafito",
-    "midnight",
-    "dark",
-    "titanio",
-    "s24",
-    "airpods",
-    "audio",
-    "pro",
-    "iphone",
-    "samsung",
-  ];
-  const lightHints = ["blanco", "rosa", "silver", "gris", "light", "clear", "titanio", "transparente", "mist"]; 
-
-  if (darkHints.some((hint) => combined.includes(hint))) {
-    return "bg-slate-900/70 text-white border border-white/10";
-  }
-
-  if (lightHints.some((hint) => combined.includes(hint))) {
-    return "bg-slate-200/80 text-slate-900 border border-slate-300/70";
-  }
-
-  return "bg-slate-500/50 text-white border border-white/10";
-}
-
 export function ProductCard({ product }: { product: Product }) {
   const { addLine } = useCart();
   const [added, setAdded] = useState(false);
@@ -60,7 +30,6 @@ export function ProductCard({ product }: { product: Product }) {
   const outOfStock = product.stock.status === "out-of-stock";
   const storage = product.storages[0];
   const color = product.colors[0];
-  const bottomBadgeTone = getProductImageBadgeTone(product);
 
   function handleAdd() {
     if (outOfStock || added) return;
@@ -76,12 +45,13 @@ export function ProductCard({ product }: { product: Product }) {
     window.setTimeout(() => setAdded(false), 1200);
   }
 
-  // Determinar el badge kind basado en si el producto es destacado
-  const badgeKind: BadgeKind = product.featured ? "primary" : "success";
+  // Tone of the state badge comes from the product data so it stays visually
+  // distinct from the violet "featured" marker shown on the opposite corner.
+  const badgeKind: BadgeKind = product.badge.kind;
 
   return (
     <article
-      className={`w-full min-w-0 bg-surface-container-lowest rounded-[18px] p-2.5 flex flex-col justify-between shadow-sm ${
+      className={`@container w-full min-w-0 bg-surface-container-lowest rounded-[18px] p-2.5 flex flex-col justify-between shadow-sm ${
         outOfStock ? "opacity-80" : "active:scale-[0.99] transition-transform"
       }`}
     >
@@ -96,35 +66,39 @@ export function ProductCard({ product }: { product: Product }) {
               sizes="(max-width: 640px) 45vw, 240px"
               className={`object-cover ${outOfStock ? "grayscale-[30%]" : ""}`}
             />
-            {/* Badge de subcategoría - basado en ProductListSerializer subcategory_name */}
+            {/*
+              Single overlay row for the top badges. Both badges share one flex
+              track (state badge on the left, optional "featured" marker on the
+              right) so they can never overlap: when space runs short the state
+              badge shrinks and truncates instead of colliding with the marker.
+            */}
+            <div className="absolute inset-x-2 top-2 flex items-start justify-between gap-1.5">
               <span
-                className={`absolute top-2 left-2 px-2 py-0.5 rounded-full font-label-compact text-[11px] font-semibold ${badgeTone(
+                title={product.badge.label}
+                className={`inline-flex min-w-0 items-center gap-1 px-2 py-0.5 rounded-full font-label-compact text-[10px] font-semibold ${badgeTone(
                   badgeKind,
-                )} ${product.badge.dot ? "flex items-center gap-1" : ""}`}
+                )}`}
               >
                 {product.badge.dot ? (
-                  <span className={`w-1.5 h-1.5 rounded-full ${dotTone(badgeKind)}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotTone(badgeKind)}`} />
                 ) : null}
-                {product.badge.label}
+                <span className="truncate">{product.badge.label}</span>
               </span>
-              {/* Subcategory small label (separate element to avoid absolute nesting issues) */}
-              {product.subcategory_name && (
+              {product.featured ? (
                 <span
-                  className={`absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md font-label-compact text-[9px] font-semibold whitespace-nowrap shadow-sm backdrop-blur-sm ${bottomBadgeTone}`}
+                  role="img"
+                  aria-label="Destacado"
+                  title="Destacado"
+                  className="shrink-0 inline-flex items-center gap-1 px-1.5 @min-[190px]:px-2 py-0.5 rounded-full bg-violet-600/90 text-white border border-violet-200/40 shadow-sm font-label-compact text-[9px] font-bold tracking-wide backdrop-blur-sm"
                 >
-                  {product.subcategory_name}
+                  <Icon name="star" className="text-[11px]" filled />
+                  {/* Show the label only when the card is wide enough (container query). */}
+                  <span className="hidden @min-[190px]:inline">Destacado</span>
                 </span>
-              )}
-            {/* Distintivo visual para productos destacados (is_featured) */}
-            {product.featured && (
-              <span
-                className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-violet-600/90 text-white border border-violet-200/40 shadow-sm font-label-compact text-[9px] font-bold tracking-wide backdrop-blur-sm"
-              >
-                Destacado
-              </span>
-            )}
+              ) : null}
+            </div>
           </div>
-          {/* shortSpec removed - using subcategory info instead */}
+          {/* subcategory_name is rendered once, below the title (no duplicated image badge). */}
           <h3 className="font-callout text-callout text-ink-primary font-semibold leading-tight line-clamp-1 mt-0.5">
             {product.name}
           </h3>
