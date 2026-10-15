@@ -8,14 +8,12 @@ import type { Category, Product } from "@/lib/types";
 import { useMockCategories, useMockSubcategories, useMockProducts } from "@/lib/mockApi";
 
 // --- Mock configuration ---
-// Set to null to use real API fetch instead of mock data
-const MOCK_ACTIVE_CATEGORY: "todos" | null = "todos";
+// Set initial mock active category (use 'todos' to show all)
+const MOCK_ACTIVE_CATEGORY: Category["id"] = "todos";
 
 export function StoreCatalog() {
   // State initialization: use mock mode or null for real API
-  const [activeCategory, setActiveCategory] = useState<
-    Category["id"] | null
-  >(MOCK_ACTIVE_CATEGORY === "todos" ? null : "todos");
+  const [activeCategory, setActiveCategory] = useState<Category["id"] | null>(MOCK_ACTIVE_CATEGORY);
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const [activePath, setActivePath] = useState<string>("Todos");
   const [productCount, setProductCount] = useState(0);
@@ -39,8 +37,9 @@ export function StoreCatalog() {
 
   // Products from mock API (or real backend fetch)
   useEffect(() => {
+    const catFilter = activeCategory === "todos" ? undefined : (activeCategory as string | undefined);
     const { data: fetchedProducts, meta } = useMockProducts({
-      category_slug: activeCategory as string | undefined,
+      category_slug: catFilter,
       subcategory_slug: activeSubcategory as string | undefined,
     });
     setProducts(fetchedProducts);
@@ -80,7 +79,7 @@ export function StoreCatalog() {
         </div>
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar py-0.5" id="subcategoriesContainer">
           {subs.map((sub, index) => {
-            const isActive = activeSubcategory === sub.name;
+            const isActive = activeSubcategory === sub.slug;
             const pillClass = isActive
               ? "subcat-pill active flex items-center gap-2 h-9 px-3 rounded-full bg-primary-container text-on-primary font-callout text-xs font-semibold whitespace-nowrap shadow-sm active:scale-[0.97] transition-all"
               : "subcat-pill flex items-center gap-2 h-9 px-3 rounded-full bg-surface-base border border-border-hairline text-ink-primary font-callout text-xs font-semibold whitespace-nowrap active:scale-[0.97] transition-all";
@@ -90,7 +89,7 @@ export function StoreCatalog() {
                 key={sub.name}
                 className={pillClass}
                 onClick={() => {
-                  setActiveSubcategory(sub.name);
+                  setActiveSubcategory(sub.slug);
                   setActivePath(
                     `${categoryLabels[activeCategory as keyof Record<Category["id"], string>]} → ${sub.name} (` + sub.count + ` productos sincronizados)`
                   );
@@ -125,7 +124,7 @@ export function StoreCatalog() {
     }
 
     return (
-      <div className="grid grid-cols-2 gap-3 mt-space-xs">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-space-xs">
         {products.map((product) => (
           <ProductCard key={product.slug} product={product} />
         ))}

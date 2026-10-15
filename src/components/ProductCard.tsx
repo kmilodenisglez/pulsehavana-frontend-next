@@ -50,12 +50,12 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <article
-      className={`bg-surface-container-lowest rounded-[18px] p-2.5 flex flex-col justify-between shadow-sm ${
+      className={`w-full min-w-0 bg-surface-container-lowest rounded-[18px] p-2.5 flex flex-col justify-between shadow-sm ${
         outOfStock ? "opacity-80" : "active:scale-[0.99] transition-transform"
       }`}
     >
-      <div className="flex flex-col">
-        <Link href={`/product/${product.slug}`} className="flex flex-col">
+      <div className="flex flex-col w-full min-w-0">
+        <Link href={`/product/${product.slug}`} className="flex flex-col w-full min-w-0">
           <div className="relative w-full aspect-square bg-surface-container rounded-[12px] overflow-hidden flex items-center justify-center mb-2.5">
             {/* Image: use safe fallback if image is missing */}
             <Image
