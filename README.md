@@ -91,7 +91,10 @@ confirmation screen falls back to the design defaults (`PHC-7842`, USD 968.00).
 src/
   app/                 App Router routes + globals.css (design tokens) + layout.tsx
     fonts/             Self-hosted Material Symbols (next/font/local)
-  components/          UI: header, catalog, detail, checkout, confirmation, nav, FAB, icon
+    favicon.ico        App icons (Next.js file conventions, generated from the brand logo)
+    icon.png
+    apple-icon.png
+  components/          UI: header, catalog, detail, checkout, confirmation, nav, FAB, icon, pill scroller
   lib/
     assets.ts          CDN image/logo URLs
     catalog.ts         Products, categories, seed cart
@@ -99,6 +102,9 @@ src/
     order.ts           Order read/write + WhatsApp helpers
     format.ts          Currency/number formatting
     types.ts           Shared types
+scripts/
+  generate-app-icons.sh  Regenerates the src/app app icons from the brand logo master
+  subset-material-symbols.py
 data_tmp/              Reference designs (not part of the build)
 ```
 
@@ -113,6 +119,9 @@ data_tmp/              Reference designs (not part of the build)
   Google Fonts stylesheet can override Tailwind's layered `text-[Npx]` utilities.
 - Verified against the reference screenshots at 390×844 @2x: all four screens match at
   ~0.01% pixel difference (sub-threshold anti-aliasing, no real divergent regions).
+- App icons (`favicon.ico`, `icon.png`, `apple-icon.png`) are generated from
+  `public/brand/pulse-havana-logo.webp` via `scripts/generate-app-icons.sh` (requires
+  ImageMagick). Re-run it if the brand logo changes.
 
 ## Optional: visual verification against the designs
 
