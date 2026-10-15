@@ -23,6 +23,36 @@ function dotTone(kind: BadgeKind): string {
   return kind === "primary" ? "bg-white" : "bg-white";
 }
 
+function getProductImageBadgeTone(product: Product): string {
+  const combined = `${product.name} ${product.subcategory_name ?? ""} ${product.shortSpec ?? ""} ${product.colorLabel ?? ""}`.toLowerCase();
+  const darkHints = [
+    "negro",
+    "black",
+    "obsidiana",
+    "grafito",
+    "midnight",
+    "dark",
+    "titanio",
+    "s24",
+    "airpods",
+    "audio",
+    "pro",
+    "iphone",
+    "samsung",
+  ];
+  const lightHints = ["blanco", "rosa", "silver", "gris", "light", "clear", "titanio", "transparente", "mist"]; 
+
+  if (darkHints.some((hint) => combined.includes(hint))) {
+    return "bg-slate-900/70 text-white border border-white/10";
+  }
+
+  if (lightHints.some((hint) => combined.includes(hint))) {
+    return "bg-slate-200/80 text-slate-900 border border-slate-300/70";
+  }
+
+  return "bg-slate-500/50 text-white border border-white/10";
+}
+
 export function ProductCard({ product }: { product: Product }) {
   const { addLine } = useCart();
   const [added, setAdded] = useState(false);
@@ -30,6 +60,7 @@ export function ProductCard({ product }: { product: Product }) {
   const outOfStock = product.stock.status === "out-of-stock";
   const storage = product.storages[0];
   const color = product.colors[0];
+  const bottomBadgeTone = getProductImageBadgeTone(product);
 
   function handleAdd() {
     if (outOfStock || added) return;
@@ -79,7 +110,7 @@ export function ProductCard({ product }: { product: Product }) {
               {/* Subcategory small label (separate element to avoid absolute nesting issues) */}
               {product.subcategory_name && (
                 <span
-                  className={`absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-surface-container-high/50 text-ink-secondary font-label-compact text-[9px] font-semibold whitespace-nowrap backdrop-blur-sm`}
+                  className={`absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md font-label-compact text-[9px] font-semibold whitespace-nowrap shadow-sm backdrop-blur-sm ${bottomBadgeTone}`}
                 >
                   {product.subcategory_name}
                 </span>
@@ -87,7 +118,7 @@ export function ProductCard({ product }: { product: Product }) {
             {/* Distintivo visual para productos destacados (is_featured) */}
             {product.featured && (
               <span
-                className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-primary-container/20 text-primary-container font-label-compact text-[9px] font-semibold backdrop-blur-sm`}
+                className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-violet-600/90 text-white border border-violet-200/40 shadow-sm font-label-compact text-[9px] font-bold tracking-wide backdrop-blur-sm"
               >
                 Destacado
               </span>
