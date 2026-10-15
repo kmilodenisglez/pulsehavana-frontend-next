@@ -52,6 +52,27 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/confirmation # 20
 | **Lint & design tokens** | `npm run lint`, `npm run tokens:check` |
 | **Production build** | `npm run build` (also type-checks) |
 
+Dependency updates are automated weekly via `.github/dependabot.yml` (npm + GitHub Actions, grouped into one PR per week for routine minor/patch bumps).
+
+## Deployment
+
+### Netlify (current)
+
+Deployed on Netlify through the repository's Git integration. Next.js runs on Netlify's **OpenNext adapter with zero configuration** — no `netlify.toml` is committed on purpose, since declaring one would override the dashboard settings:
+
+- **Production:** pushes to the production branch (configured in Netlify) deploy automatically.
+- **Preview:** every pull request gets an isolated **Deploy Preview** URL — no custom CI deploy workflow is needed (a GitHub Actions deploy would duplicate this and require Netlify secrets).
+- Netlify fully supports the `cacheComponents` and Turbopack features enabled in `next.config.ts`.
+- Optional hardening: enable **skew protection** by setting `NETLIFY_NEXT_SKEW_PROTECTION=true` in the site's environment variables.
+
+### VPS + Django backend (planned)
+
+When the frontend moves next to the Django backend on a VPS:
+
+- Build with `output: "standalone"` (`next.config.ts`) and run `next start` behind Nginx (reverse proxy + TLS), with Nginx serving `/_next/static` and the app icons.
+- Point the app at the Django API through an environment variable.
+- Deploy via a GitHub Actions job (build + SSH/rsync) instead of Netlify's Git integration. `.github/workflows/ci.yml` already guarantees the build is green first.
+
 ## Routes
 
 | Route | Screen | Notes |
