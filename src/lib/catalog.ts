@@ -32,6 +32,7 @@ const iphone15ProMax: Product = {
   stock: { status: "low-stock", label: "En stock (3 unid.)", units: 3 },
   badge: { label: "Nuevo", kind: "success", dot: true },
   seriesTag: "Pro Grade",
+  subcategory_name: "Apple",
   condition: "Libre de Fábrica",
   colorLabel: "Acabado Titanio",
   description:
@@ -94,6 +95,7 @@ const iphone15Pro: Product = {
   stock: { status: "in-stock", label: "En Stock" },
   badge: { label: "Nuevo", kind: "success", dot: true },
   seriesTag: "Pro Grade",
+  subcategory_name: "Apple",
   condition: "Libre de Fábrica",
   colorLabel: "Acabado Titanio",
   description:

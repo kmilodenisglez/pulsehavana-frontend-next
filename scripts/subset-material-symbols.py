@@ -81,6 +81,11 @@ def used_icons(available: set[str]) -> set[str]:
         text = path.read_text(encoding="utf-8")
         literals.update(re.findall(r'"([A-Za-z0-9_]+)"', text))
         literals.update(re.findall(r"'([A-Za-z0-9_]+)'", text))
+        # Also detect bare JSX text children like: <span>swap_vert</span>
+        # and simple inline uses of icon ligatures that are not quoted.
+        literals.update(re.findall(r">\s*([A-Za-z0-9_]+)\s*<", text))
+    # Also consider any icon names exported by a helper dev file (e.g. src/dev/icon-list.ts)
+    # which may include explicit lists. They will appear as quoted literals above.
     return literals & available
 
 

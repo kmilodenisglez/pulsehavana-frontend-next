@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Icon } from "./Icon";
 import { useCart } from "@/lib/cart";
-import { formatCompact } from "@/lib/format";
+import { formatCompact, usd } from "@/lib/format";
 import type { BadgeKind, Product } from "@/lib/types";
 
 function badgeTone(kind: BadgeKind): string {
@@ -36,7 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
     addLine({
       id: `${product.slug}|${storage.label}|${color.name}`,
       slug: product.slug,
-      name: product.category === "accesorios" ? product.name : `${product.name} ${storage.label}`,
+      name: product.name,
       subtitle: `${color.name} · ${product.condition}`,
       unitPrice: storage.price,
       image: product.image,
@@ -44,6 +44,9 @@ export function ProductCard({ product }: { product: Product }) {
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1200);
   }
+
+  // Determinar el badge kind basado en si el producto es destacado
+  const badgeKind: BadgeKind = product.featured ? "primary" : "success";
 
   return (
     <article
@@ -54,51 +57,64 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-col">
         <Link href={`/product/${product.slug}`} className="flex flex-col">
           <div className="relative w-full aspect-square bg-surface-container rounded-[12px] overflow-hidden flex items-center justify-center mb-2.5">
+            {/* Image: use safe fallback if image is missing */}
             <Image
-              src={product.image}
+              src={product.image || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"}
               alt={product.name}
               fill
               sizes="(max-width: 640px) 45vw, 240px"
               className={`object-cover ${outOfStock ? "grayscale-[30%]" : ""}`}
             />
-            <span
-              className={`absolute top-2 left-2 px-2 py-0.5 rounded-full font-label-compact text-[11px] font-semibold ${badgeTone(
-                product.badge.kind,
-              )} ${product.badge.dot ? "flex items-center gap-1" : ""}`}
-            >
-              {product.badge.dot ? (
-                <span className={`w-1 h-1 rounded-full ${dotTone(product.badge.kind)}`} />
-              ) : null}
-              {product.badge.label}
-            </span>
+            {/* Badge de subcategoría - basado en ProductListSerializer subcategory_name */}
+              <span
+                className={`absolute top-2 left-2 px-2 py-0.5 rounded-full font-label-compact text-[11px] font-semibold ${badgeTone(
+                  badgeKind,
+                )} ${product.badge.dot ? "flex items-center gap-1" : ""} backdrop-blur-sm`}
+              >
+                {product.badge.dot ? (
+                  <span className={`w-1.5 h-1.5 rounded-full ${dotTone(badgeKind)}`} />
+                ) : null}
+                {product.badge.label}
+              </span>
+              {/* Subcategory small label (separate element to avoid absolute nesting issues) */}
+              {product.subcategory_name && (
+                <span
+                  className={`absolute bottom-2 left-2 px-1.5 py-0.5 rounded-md bg-surface-container-high/50 text-ink-secondary font-label-compact text-[9px] font-semibold whitespace-nowrap backdrop-blur-sm`}
+                >
+                  {product.subcategory_name}
+                </span>
+              )}
+            {/* Distintivo visual para productos destacados (is_featured) */}
+            {product.featured && (
+              <span
+                className={`absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-primary-container/20 text-primary-container font-label-compact text-[9px] font-semibold backdrop-blur-sm`}
+              >
+                Destacado
+              </span>
+            )}
           </div>
-          <span className="font-caption text-caption text-ink-secondary leading-tight">
-            {product.shortSpec}
-          </span>
+          {/* shortSpec removed - using subcategory info instead */}
           <h3 className="font-callout text-callout text-ink-primary font-semibold leading-tight line-clamp-1 mt-0.5">
             {product.name}
           </h3>
+          <span className="font-caption text-caption text-ink-secondary text-[12px] leading-tight mt-0.5">
+            {product.subcategory_name || ""}
+          </span>
           <div className="mt-2 flex items-baseline gap-1">
-            <span className="font-caption text-caption text-ink-secondary text-xs font-semibold">
-              USD
-            </span>
-            <span className="font-headline text-headline text-ink-primary font-bold tracking-tight">
+            <span className="font-caption text-ink-secondary text-xs font-bold">USD</span>
+            <span className="font-headline text-[20px] text-ink-primary font-black tracking-tight">
               {formatCompact(product.price)}
             </span>
           </div>
           <div className="mt-1 flex items-center gap-1">
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                outOfStock ? "bg-ink-secondary" : "bg-status-success"
-              }`}
-            />
-            <span
-              className={`font-caption text-caption font-medium ${
-                outOfStock ? "text-ink-secondary" : "text-status-success"
-              }`}
-            >
-              {product.stock.label}
-            </span>
+            {/* Etiqueta de condición física garantizada en tienda física */}
+            {product.condition && (
+              <span
+                className={`px-2 py-0.5 rounded-full bg-surface-container-low/50 text-ink-secondary font-label-compact text-[8px] font-semibold whitespace-nowrap backdrop-blur-sm`}
+              >
+                {product.condition}
+              </span>
+            )}
           </div>
         </Link>
       </div>
