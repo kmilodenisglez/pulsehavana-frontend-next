@@ -54,6 +54,21 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/confirmation # 20
 
 Dependency updates are automated weekly via `.github/dependabot.yml` (npm + GitHub Actions, grouped into one PR per week for routine minor/patch bumps).
 
+### Housekeeping (keeping the Actions tab clean)
+
+GitHub has **no setting for "keep only the last N runs"** — it only offers log and
+artifact **retention in days** (Settings → Actions → General). To cap the *number*
+of runs, `.github/workflows/prune-runs.yml` runs daily and keeps only the newest
+**4** runs **per workflow**:
+
+- Triggered by `schedule` and `workflow_dispatch` (inputs: `keep`, `dry_run`).
+- Uses `GITHUB_TOKEN` with `permissions: actions: write` — no PAT required.
+- Only deletes **completed** runs, so the run in progress is never touched.
+- Deleting a run also removes its logs and artifacts.
+
+> ⚠️ Deleting runs can break branch protection rules that require status checks
+> from those runs. Use `dry_run: true` first if unsure.
+
 ## Deployment
 
 ### Netlify (current)
@@ -128,6 +143,7 @@ confirmation screen falls back to the design defaults (`PHC-7842`, USD 968.00).
 ## Project structure
 
 ```
+.github/               CI: ci.yml (lint + tokens + build), prune-runs.yml (run retention), dependabot.yml
 DESIGN-SYSTEM.md       Brand + design-token contract (humans + AI agents)
 AGENTS.md              Agent instructions (Next.js rules + design-token rules)
 tokens.json            Generated DTCG mirror of the design tokens (do not edit)
