@@ -115,7 +115,7 @@ export function StoreCatalog() {
   const renderProductsGrid = () => {
     if (productCount === 0) {
       return (
-        <div className="col-span-2 pt-8 text-center">
+        <div className="col-span-full pt-8 text-center">
           <Icon name={"inventory_2"} className="text-[48px] text-primary-container" />
           <p className="font-callout text-callout text-ink-primary mt-2">Sin equipos en esta categoría</p>
           <p className="font-caption text-caption text-ink-secondary">Escríbenos por WhatsApp y te avisamos cuando llegue nuevo stock.</p>
@@ -124,7 +124,7 @@ export function StoreCatalog() {
     }
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-space-xs">
+      <div className="grid grid-cols-2 gap-3 mt-space-xs sm:grid-cols-3 lg:grid-cols-4">
         {products.map((product) => (
           <ProductCard key={product.slug} product={product} />
         ))}
@@ -204,9 +204,7 @@ export function StoreCatalog() {
             {productCount} modelos en local
           </span>
         </div>
-        <div className="grid grid-cols-2 gap-3 mt-space-xs" id="productsGrid">
-          {renderProductsGrid()}
-        </div>
+        {renderProductsGrid()}
       </section>
     </>
   );

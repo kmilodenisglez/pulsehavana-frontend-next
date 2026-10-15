@@ -11,16 +11,16 @@ import type { BadgeKind, Product } from "@/lib/types";
 function badgeTone(kind: BadgeKind): string {
   switch (kind) {
     case "success":
-      return "bg-status-success/10 text-status-success";
+      return "bg-emerald-500/90 text-white border border-emerald-200/40 shadow-sm backdrop-blur-sm";
     case "primary":
-      return "bg-primary-tint text-primary-container";
+      return "bg-violet-500/90 text-white border border-violet-200/40 shadow-sm backdrop-blur-sm";
     default:
-      return "bg-surface-container-highest text-ink-secondary";
+      return "bg-slate-900/70 text-white border border-white/15 shadow-sm backdrop-blur-sm";
   }
 }
 
 function dotTone(kind: BadgeKind): string {
-  return kind === "primary" ? "bg-primary-container" : "bg-status-success";
+  return kind === "primary" ? "bg-white" : "bg-white";
 }
 
 export function ProductCard({ product }: { product: Product }) {
@@ -69,7 +69,7 @@ export function ProductCard({ product }: { product: Product }) {
               <span
                 className={`absolute top-2 left-2 px-2 py-0.5 rounded-full font-label-compact text-[11px] font-semibold ${badgeTone(
                   badgeKind,
-                )} ${product.badge.dot ? "flex items-center gap-1" : ""} backdrop-blur-sm`}
+                )} ${product.badge.dot ? "flex items-center gap-1" : ""}`}
               >
                 {product.badge.dot ? (
                   <span className={`w-1.5 h-1.5 rounded-full ${dotTone(badgeKind)}`} />
