@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "ci": "npm ci --dry-run",
     "tokens:export": "node scripts/export-design-tokens.mjs",
     "tokens:check": "node scripts/export-design-tokens.mjs --check"
   },
@@ -23,6 +24,6 @@
     "eslint": "^10",
     "eslint-config-next": "16.4.0",
     "tailwindcss": "^4",
-    "typescript": "5.9.2"
+    "typescript": "5.9.3"
   }
 }

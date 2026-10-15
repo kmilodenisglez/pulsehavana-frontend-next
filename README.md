@@ -16,6 +16,11 @@ It is a 1:1 replica of the four mobile screens under
 npm install
 ```
 
+Use **`npm ci`** for a reproducible install straight from the lockfile (CI does).
+Whenever you change dependencies, regenerate the lock with `npm install` and verify
+it with **`npm run ci`** — `npm ci` fails when `package.json` and `package-lock.json`
+drift apart (a mismatched `typescript` pin is what broke CI before).
+
 ## Commands
 
 | Command | Description |
@@ -24,6 +29,7 @@ npm install
 | `npm run build` | Create the production build (`.next/`) |
 | `npm run start` | Serve the production build (run `npm run build` first) |
 | `npm run lint` | Run ESLint (expected: **0 problems**) |
+| `npm run ci` | Verify `package.json` and `package-lock.json` are in sync (`npm ci --dry-run`) |
 | `npm run tokens:export` | Regenerate `tokens.json` from `globals.css` (`@theme`) |
 | `npm run tokens:check` | Verify `tokens.json` is up to date (use in CI) |
 
