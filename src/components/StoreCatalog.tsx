@@ -72,7 +72,10 @@ export function StoreCatalog() {
                 data-active={isActive}
                 onClick={() => {
                   setActiveCategory(category.id);
-                  setActiveSubcategory(null);
+                  // A newly selected category opens on its first subcategory (index 0);
+                  // categories without subcategories (e.g. "todos") fall back to null.
+                  const [firstSubcategory] = getMockSubcategories(category.id);
+                  setActiveSubcategory(firstSubcategory?.slug ?? null);
                 }}
                 className={`flex items-center justify-center h-10 px-5 rounded-full font-callout text-sm font-semibold whitespace-nowrap active:scale-[0.97] transition-all duration-100 ${
                   isActive

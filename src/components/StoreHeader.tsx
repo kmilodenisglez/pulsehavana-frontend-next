@@ -14,7 +14,13 @@ export function StoreHeader() {
     <header className="fixed top-0 w-full z-50 pt-safe bg-chrome-translucent backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
       <div className="h-16 px-margin md:px-margin-desktop mx-auto w-full max-w-[1280px] flex items-center justify-between">
         <div className="flex items-center gap-space-sm min-w-0">
-          <BrandLogo />
+          <Link
+            href="/"
+            aria-label="Ir a la página de inicio"
+            className="shrink-0 rounded-lg transition-transform duration-100 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container"
+          >
+            <BrandLogo />
+          </Link>
           <div className="flex flex-col min-w-0">
             <span className="font-headline text-headline text-ink-primary leading-none truncate tracking-tight">
               Pulse Havana Center Cell
