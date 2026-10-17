@@ -15,9 +15,9 @@ export interface CategoryPillsProps {
   /** Category whose megamenu is open, so its trigger can announce the state. */
   openCategory: Category["id"] | null;
   /**
-   * Runs on click for the pills that own a megamenu. The nav decides between
-   * opening the panel and navigating (`preventDefault` when the catalog on
-   * screen already is the pill's).
+   * Runs on click for every pill: the nav unfolds or folds that category's
+   * collections (a category pill never filters on its own) and dismisses the
+   * panel when the pill has nothing to unfold.
    */
   onTrigger: (category: Category, event: React.MouseEvent<HTMLAnchorElement>) => void;
 }
@@ -25,13 +25,13 @@ export interface CategoryPillsProps {
 /**
  * Tier 1 category pills — the desktop navigation bar and megamenu trigger.
  *
- * Horizontally scrollable, keeps the selected pill centered, and each pill links
- * to `?cat=<slug>`: the filter is the URL, so it can be copied, shared and
- * prefetched, and the product grid always matches the address bar.
- *
- * A pill whose category has collections is also the trigger of that category's
- * megamenu (see `CategoryMenu`); the click still follows the link, which is what
- * makes the panel list the collections of the catalog on screen.
+ * Horizontally scrollable and keeps the selected pill centered. Every pill is
+ * still a `<Link>` to `?cat=<slug>` — the category's own shareable URL, prefetched
+ * and openable in a new tab — but a plain left click unfolds that category's
+ * collections instead of filtering: on desktop the catalog changes when a
+ * collection is picked (see `DesktopCategoryNav`), so the products on screen
+ * never jump the moment a category is explored. `Todos` has no collections and
+ * keeps working as the plain filter link it is.
  */
 export function CategoryPills({
   categories,
@@ -48,7 +48,7 @@ export function CategoryPills({
     >
       {categories.map((category) => {
         const isActive = activeCategory === category.id;
-        const hasMenu = (category.collectionCount ?? 0) > 0;
+        const hasMenu = category.collections.length > 0;
         const isOpen = hasMenu && openCategory === category.id;
 
         return (
@@ -62,7 +62,7 @@ export function CategoryPills({
             aria-expanded={hasMenu ? isOpen : undefined}
             aria-controls={isOpen ? CATEGORY_MENU_ID : undefined}
             data-active={isActive}
-            onClick={hasMenu ? (event) => onTrigger(category, event) : undefined}
+            onClick={(event) => onTrigger(category, event)}
             className={`flex items-center justify-center gap-1.5 h-10 px-5 rounded-full font-callout text-sm font-semibold whitespace-nowrap active:scale-[0.97] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container ${
               isActive
                 ? "bg-primary-container text-on-primary shadow-sm"
@@ -71,12 +71,10 @@ export function CategoryPills({
           >
             {category.label}
             {hasMenu ? (
-              /* The curated icon subset has no `expand_more`, so the right
-                 chevron is turned a quarter turn to point at the panel. */
               <Icon
-                name="chevron_right"
+                name="expand_more"
                 className={`text-[18px] transition-transform duration-200 ${
-                  isOpen ? "-rotate-90" : "rotate-90"
+                  isOpen ? "rotate-180" : ""
                 }`}
               />
             ) : null}

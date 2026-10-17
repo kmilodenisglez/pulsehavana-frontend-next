@@ -1,5 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { getMockCategories, getMockProducts, getMockSubcategories } from "./mockApi";
+import { getMockCategories, getMockProducts } from "./mockApi";
 import {
   ALL_CATEGORIES,
   selectionLabel,
@@ -25,11 +25,10 @@ import type { Category } from "./types";
  * Import this module only from Server Components (the store page does).
  *
  * Backend wiring: the two `mockApi` reads below are the seam. Replace them with
- * `GET /api/v1/categories/` and `GET /api/v1/products/?category=<slug>` when the
- * Django API answers; the shapes (`StoreCatalogData`) stay as they are. The
- * category list has to carry each category's collection count
- * (`Category.collectionCount`): the explorer captions and the megamenu trigger
- * both read it to know which categories have a Tier 2 level.
+ * `GET /api/v1/categories/` plus one `GET /api/v1/categories/{slug}/subcategories/`
+ * per category (in parallel — the storefront consumes the tree as one payload,
+ * see `Category.collections`) and `GET /api/v1/products/?category=<slug>` when
+ * the Django API answers; the shapes (`StoreCatalogData`) stay as they are.
  */
 
 /** Cache tag for `revalidateTag(CATALOG_CACHE_TAG)` when the catalog changes. */
@@ -63,8 +62,7 @@ function resolveSelection(slug: string | undefined, categories: Category[]): Cat
   }
 
   for (const parent of categories) {
-    if (parent.id === ALL_CATEGORIES) continue;
-    const collection = getMockSubcategories(parent.id).find((sub) => sub.slug === slug);
+    const collection = parent.collections.find((sub) => sub.slug === slug);
     if (collection) {
       return {
         slug: collection.slug,
@@ -92,7 +90,5 @@ export async function getStoreCatalog(cat?: string): Promise<StoreCatalogData> {
     subcategory_slug: selection.collection?.slug,
   }).data;
 
-  const collections = selection.category ? getMockSubcategories(selection.category.id) : [];
-
-  return { categories, collections, products, selection };
+  return { categories, products, selection };
 }

@@ -102,7 +102,7 @@ project's "laptop / desktop" step):
 | Range | Shell | Categories & subcategories |
 | --- | --- | --- |
 | `< lg` (mobile & tablet) | `BottomNav` visible, pages clear it with `pb-24` | Two views driven by the bottom navigation. Shop view (`inicio`): no category chrome at all. Categories view (`categorias`): `StoreCategories` (`CategoryRail` + `CollectionExplorer`) fills the screen between the header and the nav. "Categorías" toggles: picked while open, it closes the view and gives the shop back with its filters untouched (only "Inicio" clears them) |
-| `≥ lg` (desktop) | `BottomNav` hidden, pages use `lg:pb-8` | `DesktopCategoryNav`: the Tier 1 pills (`CategoryPills`) plus, for the pill that was clicked, the Tier 2 megamenu (`CategoryMenu`) that unfolds directly below the bar with the collections as a grid of artwork tiles |
+| `≥ lg` (desktop) | `BottomNav` hidden, pages use `lg:pb-8` | `DesktopCategoryNav`: the Tier 1 pills (`CategoryPills`) plus, for the pill that was clicked, the Tier 2 megamenu (`CategoryMenu`) that unfolds directly below the bar with that category's collections as a grid of artwork tiles. A pill that owns a panel only unfolds/folds it (never filters); `Todos`, which has no collections, stays a plain filter link |
 
 - The mobile/tablet view lives in `useStoreView` (`src/lib/store-view.ts`),
   backed by the URL hash (`#categorias`) like the cart is backed by
@@ -123,17 +123,17 @@ project's "laptop / desktop" step):
   are `<Link>`s to those URLs (`scroll={false}`): copyable, prefetchable,
   middle-clickable. An unknown slug falls back to the whole catalog instead of an
   error page.
-- **The desktop megamenu is presentation, never a second selection**. It lists
-  the collections the server sent *for the URL's selection*, so it is opened only
-  once that category's data is on screen (the nav remembers the clicked id until
-  the selection matches it), and a shared link never opens a menu. A pill whose
-  category is already resolved — the selection itself, or the parent of the
-  selected collection, whose collections travel in the same payload — opens with
-  `preventDefault()` and no request, which is what lets a shopper browse sibling
-  collections without dropping the filter they were on; a pill for any other
-  category follows its link, i.e. one query per category change. Its tiles land
-  on the shop (`setStoreView("inicio")` + close), while "Ver todo \<category\>"
-  keeps the view hash exactly like the rail does.
+- **The desktop megamenu is presentation, never a second selection**. The whole
+  category tree travels in the payload (`Category.collections`), which is why a
+  plain left click on a Tier 1 pill never filters: it only unfolds that category's
+  collections — the same pill again folds them, and another pill swaps them, always
+  with no request and no navigation, so the panel never folds and reopens while
+  something loads. A category without collections (`Todos`) keeps its plain filter
+  link. Modified clicks (Ctrl/Cmd/Shift/Alt or a non-left button) keep
+  following the link to `?cat=<category>`, the category's own shareable URL.
+  Filtering is the collection's turn: a tile or "Ver todo \<category\>" costs one
+  query. Tiles land on the shop (`setStoreView("inicio")` + close), while
+  "Ver todo \<category\>" keeps the view hash exactly like the rail does.
 - Closing the megamenu is three ways out and no dead end: the pill again, the
   `bg-scrim` backdrop, or `Escape` (which also returns focus to the trigger).
   Layering is fixed: the header stays at `z-50`, the nav is `z-40` and holds the

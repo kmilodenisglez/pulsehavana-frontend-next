@@ -12,9 +12,9 @@ import type { Category, Subcategory } from "@/lib/types";
 export const CATEGORY_MENU_ID = "categoryMenu";
 
 export interface CategoryMenuProps {
-  /** Category the panel belongs to — the URL's own Tier 1 selection. */
+  /** Category the panel belongs to — the pill the shopper clicked. */
   category: Category;
-  /** Tier 2 collections of that category, as the server resolved them. */
+  /** Tier 2 collections of that category, straight from the tree. */
   collections: Subcategory[];
   /** Slug the URL filters by, so the current collection reads as selected. */
   activeSlug: string | null;
@@ -23,17 +23,17 @@ export interface CategoryMenuProps {
 }
 
 /**
- * Desktop megamenu: the Tier 2 collections of the selected category, as a grid
- * of artwork tiles with the name underneath.
+ * Desktop megamenu: the Tier 2 collections of a category, as a grid of artwork
+ * tiles with the name underneath.
  *
  * It unfolds directly below the navigation bar (`absolute top-full` of the
  * wrapper that holds both) and is anchored to the pill that opened it, so the
  * floating card lines up with the catalog chrome instead of the viewport.
  *
- * Content and URLs follow the same rule as every other catalog link: the panel
- * only lists the selected category's collections (the server sends no other
- * tree, and clicking a pill is what selects a category), a collection tile lands
- * on the shop, and "Ver todo <category>" keeps the mobile/tablet view hash
+ * Content and URLs follow the same rule as every other catalog link: the grid is
+ * the category tree the server sent with the page, so the panel opens with no
+ * request; a collection tile lands on the shop (that is the click that changes
+ * the catalog), and "Ver todo <category>" keeps the mobile/tablet view hash
  * exactly like the Tier 1 pills do.
  */
 export function CategoryMenu({

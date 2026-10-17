@@ -19,16 +19,12 @@ export interface StoreCatalogProps {
 // categories are a view of their own (`StoreCategories`), opened from the bottom
 // navigation, so the shop itself renders without them at those widths.
 export function StoreCatalog({ data }: StoreCatalogProps) {
-  const { categories, collections, products, selection } = data;
+  const { categories, products, selection } = data;
 
   return (
     <>
       {/* Tier 1 + Tier 2: category bar and megamenu (desktop only) */}
-      <DesktopCategoryNav
-        categories={categories}
-        collections={collections}
-        selection={selection}
-      />
+      <DesktopCategoryNav categories={categories} selection={selection} />
 
       {/* Context & quick-filter bar (ProductFilterSet) */}
       <section className="px-margin pt-space-sm pb-1">

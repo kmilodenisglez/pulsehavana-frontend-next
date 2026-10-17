@@ -32,10 +32,12 @@ export interface CatalogSelection {
 
 /** Everything the storefront renders for one URL, resolved on the server. */
 export interface StoreCatalogData {
-  /** Tier 1 categories, `Todos` first. */
+  /**
+   * The category tree, `Todos` first: each Tier 1 category carries its Tier 2
+   * collections, so the desktop megamenu can unfold any of them without asking
+   * the server again.
+   */
   categories: Category[];
-  /** Tier 2 collections of the selected category (empty while unfiltered). */
-  collections: Subcategory[];
   products: Product[];
   selection: CatalogSelection;
 }

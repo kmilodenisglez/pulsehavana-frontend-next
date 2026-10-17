@@ -1,15 +1,13 @@
 import { productImages } from "./assets";
 import type { CartLine, Category, Product } from "./types";
 
-export const categories: Category[] = [
-  { id: "todos", label: "Todos" },
-  { id: "apple-iphone", label: "Apple iPhone" },
-  { id: "samsung-galaxy", label: "Samsung Galaxy" },
-  { id: "xiaomi", label: "Xiaomi" },
-  { id: "accesorios", label: "Accesorios" },
-  { id: "panel-solar", label: "Panel Solar" },
-  { id: "estacion-energia", label: "Estación de Energía" },
-];
+/*
+  Legacy hardcoded catalog: only the product fixtures and the cart seed below are
+  still read (`allProducts`, `getProduct`, `seedCartLines`). The storefront's
+  category tree lives in `mockApi` (`getMockCategories`) and reaches the UI as the
+  URL-resolved payload, so the old flat `categories` list was dropped instead of
+  being kept as a second, diverging source of truth.
+*/
 
 const appleBadges = [
   { label: "Nuevo Sellado", kind: "success" as const, dot: true },

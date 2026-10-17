@@ -31,7 +31,9 @@ export interface StoreCategoriesProps {
  */
 export function StoreCategories({ data }: StoreCategoriesProps) {
   const { view, setView } = useStoreView();
-  const { categories, collections, selection } = data;
+  const { categories, selection } = data;
+  /** Tier 2 collections of the selected category, straight from the tree. */
+  const collections = selection.category?.collections ?? [];
 
   const isAllCategories = selection.slug === null;
   const parentLabel = selection.category?.label ?? "";
@@ -45,7 +47,7 @@ export function StoreCategories({ data }: StoreCategoriesProps) {
     ? categories
         .filter((category) => category.id !== ALL_CATEGORIES)
         .map((category) => {
-          const count = category.collectionCount ?? 0;
+          const count = category.collections.length;
           return {
             key: category.id,
             title: category.label,

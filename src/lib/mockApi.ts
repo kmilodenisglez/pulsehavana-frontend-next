@@ -685,35 +685,33 @@ function categoryArtwork(slug: string): string | undefined {
 
 /**
  * Get categories (Tier 1) (mimics /api/v1/categories/).
- * Includes the "Todos" pseudo-category plus one tile per parent category.
+ * Includes the "Todos" pseudo-category plus one tile per parent category, each
+ * carrying its Tier 2 collections: the storefront consumes the tree as one
+ * payload (`Category.collections`), so no screen has to ask for a subtree.
  */
 export function getMockCategories(): Category[] {
-  /** Collections inside the category, as the tree knows them. */
-  const collectionCount = (slug: string): number =>
-    mockCategoriesTree.find((category) => category.slug === slug)?.subcategories.length ?? 0;
-
   const result: Category[] = [
-    { id: "todos", label: "Todos", icon: "grid_view" },
+    { id: "todos", label: "Todos", icon: "grid_view", collections: [] },
     {
       id: "telefonos",
       label: "Teléfonos",
       icon: "smartphone",
       image: categoryArtwork("telefonos"),
-      collectionCount: collectionCount("telefonos"),
+      collections: getMockSubcategories("telefonos"),
     },
     {
       id: "energia",
       label: "Energía & Respaldo",
       icon: "battery_charging_full",
       image: categoryArtwork("energia"),
-      collectionCount: collectionCount("energia"),
+      collections: getMockSubcategories("energia"),
     },
     {
       id: "accesorios",
       label: "Audio & Accesorios",
       icon: "headphones",
       image: categoryArtwork("accesorios"),
-      collectionCount: collectionCount("accesorios"),
+      collections: getMockSubcategories("accesorios"),
     },
   ];
   return result;

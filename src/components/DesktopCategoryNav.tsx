@@ -4,12 +4,11 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { CategoryMenu } from "./CategoryMenu";
 import { CategoryPills } from "./CategoryPills";
 import { ALL_CATEGORIES, type CatalogSelection } from "@/lib/store-catalog";
-import type { Category, Subcategory } from "@/lib/types";
+import type { Category } from "@/lib/types";
 
 export interface DesktopCategoryNavProps {
+  /** Category tree, each Tier 1 node carrying its Tier 2 collections. */
   categories: Category[];
-  /** Collections of the selected category — the megamenu's grid. */
-  collections: Subcategory[];
   /** Selection of the current URL, resolved on the server. */
   selection: CatalogSelection;
 }
@@ -18,39 +17,32 @@ export interface DesktopCategoryNavProps {
  * Desktop category navigation: the Tier 1 pill bar plus, for the pill that was
  * clicked, the Tier 2 megamenu that unfolds below it over a dimmed page.
  *
- * Opening the panel is deliberately free of catalog side effects: a pill whose
- * category the server has already resolved — the selected one, or the parent of
- * the selected collection, whose collections travel with the same payload —
- * opens without navigating at all, so browsing siblings never drops the filter
- * the shopper was looking at (and the panel can mark the collection they are in).
- * A pill for any other category still follows its link, which is what makes that
- * category's collections the panel's content: one `?cat=<slug>` query per
- * category change, exactly like a collection tile.
+ * On desktop a category pill never filters: it only unfolds that category's
+ * collections, and the catalog changes when the shopper clicks a collection (or
+ * "Ver todo <category>" inside the panel). That is why the panel can open
+ * instantly and for *any* category — the tree travels with the page
+ * (`Category.collections`) — and why switching categories never re-folds the
+ * panel: there is no navigation in flight for it to wait on.
  *
- * The panel is transient presentation, not a second source of truth: it is keyed
- * to the URL selection, so it shows nothing until the clicked category's data
- * arrives, and a shared link never opens a menu nobody asked for.
+ * The panel is transient presentation, not a second source of truth: it is open
+ * state only, the products behind it stay whatever the URL says, and a shared
+ * link never opens a menu nobody asked for.
  */
-export function DesktopCategoryNav({
-  categories,
-  collections,
-  selection,
-}: DesktopCategoryNavProps) {
-  /** Category the user opened, remembered until its data is the URL's. */
+export function DesktopCategoryNav({ categories, selection }: DesktopCategoryNavProps) {
+  /** Category whose panel is open (`null` while none is). */
   const [openId, setOpenId] = useState<Category["id"] | null>(null);
 
   const activeCategoryId = selection.category?.id ?? ALL_CATEGORIES;
-  const menuCategory =
-    openId === activeCategoryId
-      ? (categories.find((category) => category.id === openId) ?? null)
-      : null;
-  /** The selection must have landed *and* brought collections to show a panel. */
-  const isMenuOpen = menuCategory !== null && collections.length > 0;
-  const menuCategoryId = menuCategory?.id ?? null;
+  const menuCategory = openId
+    ? (categories.find((category) => category.id === openId) ?? null)
+    : null;
+  /** No collections means nothing to unfold, so the pill stays a plain link. */
+  const isMenuOpen = menuCategory !== null && menuCategory.collections.length > 0;
+  const menuCategoryId = isMenuOpen && menuCategory ? menuCategory.id : null;
 
   // Escape closes the panel and hands focus back to the pill that opened it.
   useEffect(() => {
-    if (!isMenuOpen || menuCategoryId === null) return;
+    if (menuCategoryId === null) return;
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
@@ -60,21 +52,25 @@ export function DesktopCategoryNav({
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isMenuOpen, menuCategoryId]);
+  }, [menuCategoryId]);
 
   function handleTrigger(category: Category, event: MouseEvent<HTMLAnchorElement>) {
-    // Second click on the open pill: fold the panel back up and stay where we are.
-    if (openId === category.id) {
-      event.preventDefault();
+    // Modified clicks keep the link's own behaviour (the href is the category's
+    // shareable URL, e.g. "open in a new tab" keeps working).
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+
+    // A category with nothing to unfold (`Todos`) stays a plain filter link, but
+    // picking it still dismisses an open panel: the bar and the overlay must
+    // never show two different categories.
+    if (category.collections.length === 0) {
       setOpenId(null);
       return;
     }
 
-    // The collections of this category are already in hand (it is the selection,
-    // or the parent of the selected collection): open the panel without paying
-    // for a navigation that would only move the shopper out of their filter.
-    if (category.id === activeCategoryId) event.preventDefault();
-    setOpenId(category.id);
+    // Left click is only ever "show me this category's collections": filtering
+    // is the collection's job, so the pill never lands on products on its own.
+    event.preventDefault();
+    setOpenId((previous) => (previous === category.id ? null : category.id));
   }
 
   return (
@@ -106,7 +102,7 @@ export function DesktopCategoryNav({
         {isMenuOpen && menuCategory ? (
           <CategoryMenu
             category={menuCategory}
-            collections={collections}
+            collections={menuCategory.collections}
             activeSlug={selection.slug}
             onClose={() => setOpenId(null)}
           />
