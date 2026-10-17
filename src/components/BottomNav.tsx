@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "./Icon";
 import { useCart } from "@/lib/cart";
+import { clearStoreFilters } from "@/lib/store-filters";
 import { useStoreView, type StoreView } from "@/lib/store-view";
 
 interface NavContext {
@@ -22,6 +23,8 @@ interface NavItem {
    * explorer; the cart opens its own route and comes back to the shop.
    */
   view: StoreView;
+  /** Extra store state the item sets on top of `view`. */
+  onSelect?: () => void;
 }
 
 const items: NavItem[] = [
@@ -30,6 +33,9 @@ const items: NavItem[] = [
     label: "Inicio",
     icon: "home",
     view: "inicio",
+    // "Inicio" is the shop's home, so it drops any active filter: the tab always
+    // lands on every product with the hero, and never on a leftover collection.
+    onSelect: clearStoreFilters,
     isActive: ({ pathname, view }) => pathname === "/" && view === "inicio",
   },
   {
@@ -54,8 +60,10 @@ const items: NavItem[] = [
  *
  * It also drives the storefront views: "Categorías" opens the full-screen
  * categories view and "Inicio" brings the shop back without it (see
- * `useStoreView`). Both the click and the `href` change the view, so the items
- * keep working from other routes — e.g. the product page — without extra code.
+ * `useStoreView`). "Inicio" also clears any active catalog filter, so the home
+ * tab always lands on every product (see `useStoreFilters`). Both the click and
+ * the `href` change the view, so the items keep working from other routes —
+ * e.g. the product page — without extra code.
  */
 export function BottomNav() {
   const pathname = usePathname();
@@ -74,7 +82,10 @@ export function BottomNav() {
               key={item.label}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              onClick={() => setView(item.view)}
+              onClick={() => {
+                item.onSelect?.();
+                setView(item.view);
+              }}
               className={`flex flex-col items-center justify-center flex-1 h-12 transition-colors duration-150 active:scale-[0.97] ${
                 active ? "text-primary-container font-semibold" : "text-ink-secondary"
               }`}

@@ -108,13 +108,17 @@ project's "laptop / desktop" step):
 
 - The mobile/tablet view lives in `useStoreView` (`src/lib/store-view.ts`),
   backed by the URL hash (`#categorias`) like the cart is backed by
-  localStorage. Desktop ignores it: the shop view is `hidden lg:flex` while the
-  categories view is open and the categories view is `lg:hidden`, so the pills
-  never disappear on a wide screen.
-- `StoreHero` is the shop's root: it shows only while the catalog is
-  unfiltered (`Todos`) and steps aside as soon as a parent category or a
-  collection is picked, so the products keep the screen. It never shows in the
-  categories view.
+  localStorage, and the catalog filters live in `useStoreFilters`
+  (`src/lib/store-filters.ts`) for the same reason: the catalog *and* the bottom
+  navigation change them. Desktop ignores the view: the shop view is
+  `hidden lg:flex` while the categories view is open and the categories view is
+  `lg:hidden`, so the pills never disappear on a wide screen.
+- `StoreHero` is the shop's home header: it shows only while the catalog is
+  unfiltered (`Todos`), so any active category (parent or collection) takes it
+  away and the products keep the screen. The "Inicio" item of the `BottomNav`
+  restores that state — it clears the filters, so the home tab always lands on
+  the whole catalog with the hero — and the categories view takes the hero away
+  with the shop itself.
 - A view that owns the screen is sized explicitly — `h-[calc(100dvh-10rem)]`,
   i.e. the page's own `pt-16` + `pb-24` — instead of `flex-1` + `min-h-0`: a
   `0%` flex basis resolves as *content* while the ancestor height is indefinite,
@@ -145,6 +149,7 @@ project's "laptop / desktop" step):
 | `src/components/ProductDetail.tsx` | Badges on light surfaces |
 | `src/components/StoreCategories.tsx` | Mobile & tablet categories view (full screen) |
 | `src/lib/store-view.ts` | Mobile & tablet view state (`inicio` / `categorias`) |
+| `src/lib/store-filters.ts` | Catalog filters (category / collection), shared with the bottom navigation |
 | `src/components/CategoryRail.tsx` / `CollectionExplorer.tsx` | Mobile & tablet catalog explorer |
 | `src/components/CategoryPills.tsx` / `SubcategoryPills.tsx` | Desktop catalog pills |
 | `scripts/subset-material-symbols.py` | Regenerates the self-hosted icon font subset |

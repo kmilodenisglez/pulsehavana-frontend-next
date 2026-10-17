@@ -1,45 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import type { Category } from "@/lib/types";
+import { useStoreFilters } from "@/lib/store-filters";
 import { useStoreView } from "@/lib/store-view";
 import { StoreCatalog } from "./StoreCatalog";
 import { StoreCategories } from "./StoreCategories";
 import { StoreHero } from "./StoreHero";
 import { TrustCard } from "./TrustCard";
 
-// Initial active category ('todos' shows the full catalog).
-const INITIAL_CATEGORY: Category["id"] = "todos";
-
 /**
- * Storefront home body: owns the catalog filters and the mobile/tablet view, so
- * the hero, the catalog and the categories view always agree on the selection.
+ * Storefront home body: renders the mobile/tablet categories view and the shop,
+ * so the hero, the catalog and the explorer always agree on the selection.
+ *
+ * The filters live in `useStoreFilters` because the bottom navigation changes
+ * them too: "Inicio" clears them (the tab always lands on the whole catalog,
+ * with the hero) and the catalog/explorer filter by category or collection.
  *
  * Below `lg` the "Categorías" item of the `BottomNav` swaps the shop for the
- * full-screen categories view and "Inicio" brings the shop back without any
- * category chrome (see `useStoreView`). Desktop ignores the view, so both
- * branches are always drawn there and the pills inside `StoreCatalog` handle
- * the two tiers.
+ * full-screen categories view (see `useStoreView`). Desktop ignores the view, so
+ * both branches are always drawn there and the pills inside `StoreCatalog`
+ * handle the two tiers.
  */
 export function StoreFront() {
-  const [activeCategory, setActiveCategory] = useState<Category["id"]>(INITIAL_CATEGORY);
-  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+  const {
+    activeCategory,
+    activeSubcategory,
+    isUnfiltered,
+    selectCategory,
+    selectSubcategory,
+  } = useStoreFilters();
   const { view, setView } = useStoreView();
   const isCategoriesView = view === "categorias";
-  // The hero is the root of the shop: it stays only while the catalog is
-  // unfiltered and steps aside as soon as a category or a collection is picked,
-  // leaving the products the whole screen. The categories view hides it too.
-  const isUnfiltered = activeCategory === INITIAL_CATEGORY && activeSubcategory === null;
 
-  function selectCategory(categoryId: Category["id"]) {
-    setActiveCategory(categoryId);
-    // Picking a parent category clears the subcategory filter, i.e. "all of
-    // its subcategories".
-    setActiveSubcategory(null);
-  }
-
-  function selectSubcategory(slug: string) {
-    setActiveSubcategory(slug);
+  function openSubcategory(slug: string) {
+    selectSubcategory(slug);
     // Choosing a collection is choosing what to buy: leave the categories view
     // so the shop shows those products straight away. Drilling between parent
     // categories stays in the view (that is `selectCategory`), so browsing the
@@ -56,7 +49,7 @@ export function StoreFront() {
           activeCategory={activeCategory}
           activeSubcategory={activeSubcategory}
           onSelectCategory={selectCategory}
-          onSelectSubcategory={selectSubcategory}
+          onSelectSubcategory={openSubcategory}
         />
       ) : null}
 
@@ -64,13 +57,16 @@ export function StoreFront() {
           keeps the scroll position and the already-loaded product imagery — but
           steps aside below `lg`, where the categories view owns the screen. */}
       <div className={`${isCategoriesView ? "hidden lg:flex" : "flex"} flex-col w-full`}>
-        {/* Shop marketing: only the unfiltered root keeps it (see above). */}
+        {/* The hero is the shop's home header: it only shows on the unfiltered
+            catalog, so any category (parent or collection) takes it away and the
+            products keep the screen. The categories view takes it away with the
+            shop itself. */}
         {isUnfiltered ? <StoreHero /> : null}
         <StoreCatalog
           activeCategory={activeCategory}
           activeSubcategory={activeSubcategory}
           onSelectCategory={selectCategory}
-          onSelectSubcategory={selectSubcategory}
+          onSelectSubcategory={openSubcategory}
         />
         <TrustCard />
       </div>
