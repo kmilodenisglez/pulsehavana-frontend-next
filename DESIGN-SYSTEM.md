@@ -103,7 +103,7 @@ project's "laptop / desktop" step):
 
 | Range | Shell | Categories & subcategories |
 | --- | --- | --- |
-| `< lg` (mobile & tablet) | `BottomNav` visible, pages clear it with `pb-24` | Two views driven by the bottom navigation. Shop view (`inicio`): no category chrome at all. Categories view (`categorias`): `StoreCategories` (`CategoryRail` + `CollectionExplorer`) fills the screen between the header and the nav |
+| `< lg` (mobile & tablet) | `BottomNav` visible, pages clear it with `pb-24` | Two views driven by the bottom navigation. Shop view (`inicio`): no category chrome at all. Categories view (`categorias`): `StoreCategories` (`CategoryRail` + `CollectionExplorer`) fills the screen between the header and the nav. "Categorías" toggles: picked while open, it closes the view and gives the shop back with its filters untouched (only "Inicio" clears them) |
 | `≥ lg` (desktop) | `BottomNav` hidden, pages use `lg:pb-8` | Pill rows always inline: `CategoryPills` (Tier 1) + `SubcategoryPills` (Tier 2) |
 
 - The mobile/tablet view lives in `useStoreView` (`src/lib/store-view.ts`),

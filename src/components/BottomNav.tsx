@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Icon } from "./Icon";
 import { useCart } from "@/lib/cart";
 import { clearStoreFilters } from "@/lib/store-filters";
-import { useStoreView, type StoreView } from "@/lib/store-view";
+import { setStoreView, useStoreView, type StoreView } from "@/lib/store-view";
 
 interface NavContext {
   pathname: string;
@@ -14,61 +14,69 @@ interface NavContext {
 }
 
 interface NavItem {
+  /** Target URL. Resolved per render: the "Categorías" toggle points back here. */
   href: string;
   label: string;
   icon: string;
   isActive: (context: NavContext) => boolean;
-  /**
-   * View this item opens. "Inicio" is the shop and "Categorías" the full-screen
-   * explorer; the cart opens its own route and comes back to the shop.
-   */
-  view: StoreView;
-  /** Extra store state the item sets on top of `view`. */
-  onSelect?: () => void;
+  /** Store state the item sets when picked (view and, for "Inicio", filters). */
+  onSelect: () => void;
 }
 
-const items: NavItem[] = [
-  {
-    href: "/",
-    label: "Inicio",
-    icon: "home",
-    view: "inicio",
-    // "Inicio" is the shop's home, so it drops any active filter: the tab always
-    // lands on every product with the hero, and never on a leftover collection.
-    onSelect: clearStoreFilters,
-    isActive: ({ pathname, view }) => pathname === "/" && view === "inicio",
-  },
-  {
-    href: "/#categorias",
-    label: "Categorías",
-    icon: "grid_view",
-    view: "categorias",
-    isActive: ({ pathname, view }) => pathname === "/" && view === "categorias",
-  },
-  {
-    href: "/checkout",
-    label: "Carrito",
-    icon: "shopping_bag",
-    view: "inicio",
-    isActive: ({ pathname }) => pathname.startsWith("/checkout"),
-  },
-];
+/**
+ * Navigation items for the current view. Built per render because "Categorías"
+ * is a toggle: while the explorer is open its `href` points back at the shop, so
+ * picking it again closes the view and the URL drops the hash on its own.
+ */
+function buildItems(view: StoreView): NavItem[] {
+  return [
+    {
+      href: "/",
+      label: "Inicio",
+      icon: "home",
+      onSelect: () => {
+        // "Inicio" is the shop's home, so it drops any active filter: the tab
+        // always lands on every product, with the hero.
+        clearStoreFilters();
+        setStoreView("inicio");
+      },
+      isActive: ({ pathname, view }) => pathname === "/" && view === "inicio",
+    },
+    {
+      href: view === "categorias" ? "/" : "/#categorias",
+      label: "Categorías",
+      icon: "grid_view",
+      // Toggle. Closing leaves the shop exactly as it was — filters included —
+      // which is what the shopper had on screen before opening the explorer.
+      onSelect: () => setStoreView(view === "categorias" ? "inicio" : "categorias"),
+      isActive: ({ pathname, view }) => pathname === "/" && view === "categorias",
+    },
+    {
+      href: "/checkout",
+      label: "Carrito",
+      icon: "shopping_bag",
+      onSelect: () => setStoreView("inicio"),
+      isActive: ({ pathname }) => pathname.startsWith("/checkout"),
+    },
+  ];
+}
 
 /**
  * Bottom navigation for mobile & tablet. Hidden from `lg` up, where the desktop
  * chrome takes over (pages compensate with `lg:pb-8`).
  *
- * It also drives the storefront views: "Categorías" opens the full-screen
- * categories view and "Inicio" brings the shop back without it (see
- * `useStoreView`). "Inicio" also clears any active catalog filter, so the home
- * tab always lands on every product (see `useStoreFilters`). Both the click and
- * the `href` change the view, so the items keep working from other routes —
- * e.g. the product page — without extra code.
+ * It also drives the storefront views (see `useStoreView`): "Categorías" opens
+ * the full-screen explorer and, picked again, closes it back to the shop exactly
+ * as it was; "Inicio" returns to the shop and clears any active catalog filter,
+ * so the home tab always lands on every product (see `useStoreFilters`). Both
+ * the click and the `href` change the view, so the items keep working from other
+ * routes — e.g. the product page — without extra code.
  */
 export function BottomNav() {
   const pathname = usePathname();
   const { count } = useCart();
-  const { view, setView } = useStoreView();
+  const { view } = useStoreView();
+  const items = buildItems(view);
 
   return (
     <nav className="fixed bottom-0 w-full z-50 pb-safe bg-chrome-translucent backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)] lg:hidden">
@@ -82,10 +90,7 @@ export function BottomNav() {
               key={item.label}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              onClick={() => {
-                item.onSelect?.();
-                setView(item.view);
-              }}
+              onClick={item.onSelect}
               className={`flex flex-col items-center justify-center flex-1 h-12 transition-colors duration-150 active:scale-[0.97] ${
                 active ? "text-primary-container font-semibold" : "text-ink-secondary"
               }`}

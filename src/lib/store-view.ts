@@ -46,7 +46,7 @@ function getSnapshot(): StoreView {
  * shared; `replaceState` keeps a tab switch out of the history stack, and the
  * manual `emit` covers it because `replaceState` fires no `hashchange`.
  */
-function setStoreView(view: StoreView) {
+export function setStoreView(view: StoreView) {
   const { pathname, search, hash } = window.location;
   const nextHash = view === "categorias" ? CATEGORIES_HASH : "";
   if (hash !== nextHash) {
