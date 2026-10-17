@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Icon } from "./Icon";
 import { PillScroller } from "./PillScroller";
 import { ProductCard } from "./ProductCard";
@@ -8,9 +8,6 @@ import type { Category } from "@/lib/types";
 import { getMockCategories, getMockProducts, getMockSubcategories } from "@/lib/mockApi";
 
 // --- Mock configuration ---
-// Initial active category ('todos' shows the full catalog).
-const MOCK_ACTIVE_CATEGORY: Category["id"] = "todos";
-
 // Human-readable labels for the parent categories.
 const CATEGORY_LABELS: Record<Category["id"], string> = {
   todos: "Todos",
@@ -24,10 +21,21 @@ const CATEGORY_LABELS: Record<Category["id"], string> = {
   "estacion-energia": "Estación de Energía",
 };
 
-export function StoreCatalog() {
-  const [activeCategory, setActiveCategory] = useState<Category["id"]>(MOCK_ACTIVE_CATEGORY);
-  const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
+export interface StoreCatalogProps {
+  activeCategory: Category["id"];
+  activeSubcategory: string | null;
+  onSelectCategory: (categoryId: Category["id"]) => void;
+  onSelectSubcategory: (slug: string) => void;
+}
 
+// The filter state lives in `StoreFront`, which also decides whether the hero
+// is still visible; the catalog stays a presentational consumer of that state.
+export function StoreCatalog({
+  activeCategory,
+  activeSubcategory,
+  onSelectCategory,
+  onSelectSubcategory,
+}: StoreCatalogProps) {
   // The mock data layer is synchronous, so every derived value is computed
   // during render. Keeping this out of effects means the server and client
   // render identical markup (no hydration mismatch, no empty-state flash).
@@ -71,11 +79,7 @@ export function StoreCatalog() {
                 aria-pressed={isActive}
                 data-active={isActive}
                 onClick={() => {
-                  setActiveCategory(category.id);
-                  // A newly selected category opens on its first subcategory (index 0);
-                  // categories without subcategories (e.g. "todos") fall back to null.
-                  const [firstSubcategory] = getMockSubcategories(category.id);
-                  setActiveSubcategory(firstSubcategory?.slug ?? null);
+                  onSelectCategory(category.id);
                 }}
                 className={`flex items-center justify-center h-10 px-5 rounded-full font-callout text-sm font-semibold whitespace-nowrap active:scale-[0.97] transition-all duration-100 ${
                   isActive
@@ -129,7 +133,7 @@ export function StoreCatalog() {
                     aria-pressed={isActive}
                     data-active={isActive}
                     className={pillClass}
-                    onClick={() => setActiveSubcategory(sub.slug)}
+                    onClick={() => onSelectSubcategory(sub.slug)}
                   >
                     <Icon
                       name={sub.icon}

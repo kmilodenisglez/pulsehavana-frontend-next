@@ -1,4 +1,5 @@
 import type { CartLine } from "./types";
+import { buildWhatsAppLink } from "./whatsapp";
 
 export interface OrderCustomer {
   name: string;
@@ -86,7 +87,12 @@ export function buildWhatsAppMessage(order: Order): string {
   ].join("\n");
 }
 
-export function buildWhatsAppUrl(order: Order, phone = "+5359352209"): string {
-  const normalizedPhone = phone.replace(/\D/g, "");
-  return `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(buildWhatsAppMessage(order))}`;
+/**
+ * Builds the WhatsApp link that confirms `order` to the business.
+ *
+ * `phone` is required on purpose: the number lives in the store configuration
+ * (`useStoreConfig()`), so it can never be duplicated as a local default.
+ */
+export function buildOrderWhatsAppLink(order: Order, phone: string): string {
+  return buildWhatsAppLink(phone, buildWhatsAppMessage(order));
 }

@@ -23,10 +23,10 @@ export function StoreHeader() {
           </Link>
           <div className="flex flex-col min-w-0">
             <span className="font-headline text-headline text-ink-primary leading-none truncate tracking-tight">
-              Pulse Havana Center Cell
+              Pulse HCC
             </span>
             <span className="font-caption text-caption text-ink-secondary truncate leading-none mt-0.5">
-              Inicio
+              Pulse Havana Center Cell
             </span>
           </div>
         </div>

@@ -8,7 +8,7 @@ export function BrandLogo({ className = "" }: { className?: string }) {
       alt="Pulse Havana Center Cell Logo"
       width={128}
       height={128}
-      className={`h-8 w-auto object-contain shrink-0 ${className}`}
+      className={`h-9 w-auto object-contain shrink-0 ${className}`}
     />
   );
 }

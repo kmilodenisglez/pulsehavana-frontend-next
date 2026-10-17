@@ -21,6 +21,29 @@ Whenever you change dependencies, regenerate the lock with `npm install` and ver
 it with **`npm run ci`** — `npm ci` fails when `package.json` and `package-lock.json`
 drift apart (a mismatched `typescript` pin is what broke CI before).
 
+## Environment
+
+Business values (WhatsApp number, store name/address/hours) are **not hardcoded**.
+They are resolved on the server, in this order:
+
+1. `GET {API_BASE_URL}/config/` — the Django `StoreSettings` singleton, editable
+   from the Admin.
+2. Environment variables (`.env.local`, see `.env.example`).
+3. Code defaults in `src/lib/store-config.ts` (last resort).
+
+Copy `.env.example` to `.env.local` for local development. All variables are
+read at **runtime on the server**, so changing them needs no rebuild:
+
+| Variable | Purpose |
+| --- | --- |
+| `API_BASE_URL` | Base URL of the Django API. Default `http://localhost:8000/api/v1` |
+| `BUSINESS_WHATSAPP` | Fallback WhatsApp number (same name as the backend setting) |
+| `STORE_NAME`, `STORE_ADDRESS`, `STORE_HOURS`, `DEFAULT_CURRENCY` | Remaining business fallbacks |
+
+The resolved configuration reaches Client Components through
+`StoreConfigProvider` (`useStoreConfig()`); the storefront keeps rendering with
+the fallbacks when the backend is unreachable.
+
 ## Commands
 
 | Command | Description |

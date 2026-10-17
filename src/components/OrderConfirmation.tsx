@@ -6,11 +6,12 @@ import { Icon } from "./Icon";
 import { productImages } from "@/lib/assets";
 import { usd } from "@/lib/format";
 import {
-  buildWhatsAppUrl,
+  buildOrderWhatsAppLink,
   getOrderSnapshot,
   subscribeToOrder,
   type Order,
 } from "@/lib/order";
+import { useStoreConfig } from "@/lib/store-config-provider";
 
 const fallbackOrder: Order = {
   reference: "PHC-7842",
@@ -33,6 +34,7 @@ const fallbackOrder: Order = {
 const getServerSnapshot = () => null;
 
 export function OrderConfirmation() {
+  const { whatsappNumber } = useStoreConfig();
   const stored = useSyncExternalStore(subscribeToOrder, getOrderSnapshot, getServerSnapshot);
   const order = stored ?? fallbackOrder;
   const [refCopied, setRefCopied] = useState(false);
@@ -167,7 +169,7 @@ export function OrderConfirmation() {
             {/* Primary actions */}
             <div className="flex flex-col w-full space-y-space-md">
               <a
-                href={buildWhatsAppUrl(order)}
+                href={buildOrderWhatsAppLink(order, whatsappNumber)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full h-[50px] bg-primary-container text-on-primary font-callout-button text-callout-button rounded-full shadow-md active:scale-[0.97] transition-all"
