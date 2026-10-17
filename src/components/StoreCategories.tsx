@@ -1,17 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
 import { CategoryRail } from "./CategoryRail";
 import { CollectionExplorer, type CollectionItem } from "./CollectionExplorer";
 import { pluralize } from "@/lib/format";
-import { getMockCategories, getMockSubcategories } from "@/lib/mockApi";
-import type { Category } from "@/lib/types";
+import { ALL_CATEGORIES, catalogHref, type StoreCatalogData } from "@/lib/store-catalog";
+import { useStoreView } from "@/lib/store-view";
 
 export interface StoreCategoriesProps {
-  activeCategory: Category["id"];
-  activeSubcategory: string | null;
-  onSelectCategory: (categoryId: Category["id"]) => void;
-  onSelectSubcategory: (slug: string) => void;
+  /** Catalog of the current URL, resolved on the server. */
+  data: StoreCatalogData;
 }
 
 /**
@@ -26,26 +23,18 @@ export interface StoreCategoriesProps {
  * The rail and the panel scroll independently (`min-h-0` + `overflow-y-auto`),
  * which is what keeps the rail on screen while a long list of collections
  * scrolls next to it.
+ *
+ * Browsing the tree and filtering the shop are the same action: the rail and the
+ * index rows link to `?cat=<slug>` with the view kept (the explorer stays), while
+ * a collection row lands on the shop, so the address bar always holds the
+ * category the shopper is looking at.
  */
-export function StoreCategories({
-  activeCategory,
-  activeSubcategory,
-  onSelectCategory,
-  onSelectSubcategory,
-}: StoreCategoriesProps) {
-  // The mock data layer is synchronous, so every derived value is computed
-  // during render. Keeping this out of effects means the server and client
-  // render identical markup (no hydration mismatch, no empty-state flash).
-  const categories = useMemo(() => getMockCategories(), []);
+export function StoreCategories({ data }: StoreCategoriesProps) {
+  const { view, setView } = useStoreView();
+  const { categories, collections, selection } = data;
 
-  const subcategories = useMemo(
-    () => (activeCategory === "todos" ? [] : getMockSubcategories(activeCategory)),
-    [activeCategory],
-  );
-
-  const isAllCategories = activeCategory === "todos";
-  const parentLabel =
-    categories.find((category) => category.id === activeCategory)?.label ?? activeCategory;
+  const isAllCategories = selection.slug === null;
+  const parentLabel = selection.category?.label ?? "";
 
   /*
     Tier 2 rows. While "Todos" is selected there is no parent to drill into, so
@@ -54,9 +43,9 @@ export function StoreCategories({
   */
   const rows: CollectionItem[] = isAllCategories
     ? categories
-        .filter((category) => category.id !== "todos")
+        .filter((category) => category.id !== ALL_CATEGORIES)
         .map((category) => {
-          const count = getMockSubcategories(category.id).length;
+          const count = category.collectionCount ?? 0;
           return {
             key: category.id,
             title: category.label,
@@ -64,23 +53,28 @@ export function StoreCategories({
             icon: category.icon,
             image: category.image,
             isActive: false,
-            onSelect: () => onSelectCategory(category.id),
+            href: catalogHref(category.id, view),
           };
         })
-    : subcategories.map((sub) => ({
+    : collections.map((sub) => ({
         key: sub.slug,
         title: sub.name,
         caption: `${sub.count} ${pluralize(sub.count, "producto", "productos")}`,
         icon: sub.icon,
         image: sub.image,
-        isActive: activeSubcategory === sub.slug,
-        onSelect: () => onSelectSubcategory(sub.slug),
+        isActive: selection.collection?.slug === sub.slug,
+        // Choosing a collection is choosing what to buy, so the link lands on the
+        // shop (no view hash) and closes the explorer right away with the view
+        // store: the router's own URL update happens outside React's render, so
+        // dropping the hash cannot close the view on its own.
+        href: catalogHref(sub.slug),
+        onSelect: () => setView("inicio"),
       }));
 
   const title = isAllCategories ? "Todo el catálogo" : parentLabel;
   const countLabel = isAllCategories
     ? `${rows.length} ${pluralize(rows.length, "categoría", "categorías")}`
-    : `${subcategories.length} ${pluralize(subcategories.length, "colección", "colecciones")}`;
+    : `${collections.length} ${pluralize(collections.length, "colección", "colecciones")}`;
 
   return (
     <section
@@ -97,8 +91,7 @@ export function StoreCategories({
     >
       <CategoryRail
         categories={categories}
-        activeCategory={activeCategory}
-        onSelect={onSelectCategory}
+        activeCategory={selection.category?.id ?? ALL_CATEGORIES}
       />
       <CollectionExplorer title={title} countLabel={countLabel} items={rows} />
     </section>

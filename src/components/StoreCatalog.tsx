@@ -1,78 +1,43 @@
 "use client";
 
-import { useMemo } from "react";
 import { CategoryPills } from "./CategoryPills";
 import { Icon } from "./Icon";
 import { ProductCard } from "./ProductCard";
 import { SubcategoryPills } from "./SubcategoryPills";
-import type { Category } from "@/lib/types";
-import { getMockCategories, getMockProducts, getMockSubcategories } from "@/lib/mockApi";
+import { ALL_CATEGORIES, type StoreCatalogData } from "@/lib/store-catalog";
 
 export interface StoreCatalogProps {
-  activeCategory: Category["id"];
-  activeSubcategory: string | null;
-  onSelectCategory: (categoryId: Category["id"]) => void;
-  onSelectSubcategory: (slug: string) => void;
+  /** Catalog of the current URL: the filter never becomes component state. */
+  data: StoreCatalogData;
 }
 
-// The filter state lives in `StoreFront`, which also decides whether the hero
-// is still visible; the catalog stays a presentational consumer of that state.
+// The selection lives in the URL and is resolved by the server; the catalog only
+// renders it. Picking a category is a navigation (the pills and the explorer are
+// links), so the grid always shows the products of the URL on screen.
 //
 // Category chrome here is desktop-only: from `lg` up both tiers are pill rows
 // (`CategoryPills` + `SubcategoryPills`). Below `lg` the categories are a view
 // of their own (`StoreCategories`), opened from the bottom navigation, so the
 // shop itself renders without them at those widths.
-export function StoreCatalog({
-  activeCategory,
-  activeSubcategory,
-  onSelectCategory,
-  onSelectSubcategory,
-}: StoreCatalogProps) {
-  // The mock data layer is synchronous, so every derived value is computed
-  // during render. Keeping this out of effects means the server and client
-  // render identical markup (no hydration mismatch, no empty-state flash).
-  const categories = useMemo(() => getMockCategories(), []);
+export function StoreCatalog({ data }: StoreCatalogProps) {
+  const { categories, collections, products, selection } = data;
 
-  const products = useMemo(
-    () =>
-      getMockProducts({
-        category_slug: activeCategory === "todos" ? undefined : activeCategory,
-        subcategory_slug: activeSubcategory ?? undefined,
-      }).data,
-    [activeCategory, activeSubcategory],
-  );
-
-  const subcategories = useMemo(
-    () => (activeCategory === "todos" ? [] : getMockSubcategories(activeCategory)),
-    [activeCategory],
-  );
-
-  const isAllCategories = activeCategory === "todos";
-  const parentLabel =
-    categories.find((category) => category.id === activeCategory)?.label ?? activeCategory;
-  const activeSub = subcategories.find((sub) => sub.slug === activeSubcategory) ?? null;
-
-  // The product count already is the supporting line below, so the breadcrumb
-  // keeps just the path — it is the only filter indicator the mobile shop view
-  // has, and it has to fit one line there.
-  const breadcrumb = activeSub ? `${parentLabel} → ${activeSub.name}` : parentLabel;
+  const activeCategory = selection.category?.id ?? ALL_CATEGORIES;
+  const activeSubcategory = selection.collection?.slug ?? null;
+  const isAllCategories = selection.slug === null;
+  const parentLabel = selection.category?.label ?? "";
 
   return (
     <>
       {/* Tier 1 + Tier 2: categories and subcategories (desktop only) */}
       <section className="hidden lg:block w-full py-space-sm">
-        <CategoryPills
-          categories={categories}
-          activeCategory={activeCategory}
-          onSelect={onSelectCategory}
-        />
-        {!isAllCategories && subcategories.length > 0 && (
+        <CategoryPills categories={categories} activeCategory={activeCategory} />
+        {!isAllCategories && collections.length > 0 && (
           <div className="px-margin pt-1">
             <SubcategoryPills
               parentLabel={parentLabel}
-              subcategories={subcategories}
+              subcategories={collections}
               activeSubcategory={activeSubcategory}
-              onSelect={onSelectSubcategory}
             />
           </div>
         )}
@@ -91,7 +56,7 @@ export function StoreCatalog({
                 className="font-callout text-[13px] font-semibold text-ink-primary truncate"
                 id="activeFilterBreadcrumb"
               >
-                {breadcrumb}
+                {selection.label}
               </span>
               <span className="font-caption text-[11px] text-ink-secondary leading-none">
                 {products.length} productos sincronizados

@@ -688,6 +688,10 @@ function categoryArtwork(slug: string): string | undefined {
  * Includes the "Todos" pseudo-category plus one tile per parent category.
  */
 export function getMockCategories(): Category[] {
+  /** Collections inside the category, as the tree knows them. */
+  const collectionCount = (slug: string): number =>
+    mockCategoriesTree.find((category) => category.slug === slug)?.subcategories.length ?? 0;
+
   const result: Category[] = [
     { id: "todos", label: "Todos", icon: "grid_view" },
     {
@@ -695,18 +699,21 @@ export function getMockCategories(): Category[] {
       label: "Teléfonos",
       icon: "smartphone",
       image: categoryArtwork("telefonos"),
+      collectionCount: collectionCount("telefonos"),
     },
     {
       id: "energia",
       label: "Energía & Respaldo",
       icon: "battery_charging_full",
       image: categoryArtwork("energia"),
+      collectionCount: collectionCount("energia"),
     },
     {
       id: "accesorios",
       label: "Audio & Accesorios",
       icon: "headphones",
       image: categoryArtwork("accesorios"),
+      collectionCount: collectionCount("accesorios"),
     },
   ];
   return result;

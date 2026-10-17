@@ -1,12 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { CollectionThumb } from "./CollectionThumb";
+import { catalogHref } from "@/lib/store-catalog";
+import { useStoreView } from "@/lib/store-view";
 import type { Category } from "@/lib/types";
 
 export interface CategoryRailProps {
   categories: Category[];
   activeCategory: Category["id"];
-  onSelect: (categoryId: Category["id"]) => void;
 }
 
 /**
@@ -17,13 +19,18 @@ export interface CategoryRailProps {
  * reads as connected to the panel it filters. Desktop renders `CategoryPills`
  * instead.
  *
+ * Each tile links to `?cat=<slug>` — picking a category *is* navigating to that
+ * catalog — and keeps the view hash, so drilling through the tree never leaves
+ * the explorer.
+ *
  * The rail spans the full height of the explorer and scrolls on its own, so a
  * long list of categories never pushes the detail panel around.
  */
-export function CategoryRail({ categories, activeCategory, onSelect }: CategoryRailProps) {
+export function CategoryRail({ categories, activeCategory }: CategoryRailProps) {
+  const { view } = useStoreView();
+
   return (
-    <div
-      role="group"
+    <nav
       aria-label="Categorías"
       className="w-[98px] shrink-0 bg-surface-muted flex flex-col items-center gap-1.5 py-2 overflow-y-auto"
     >
@@ -31,12 +38,12 @@ export function CategoryRail({ categories, activeCategory, onSelect }: CategoryR
         const isActive = category.id === activeCategory;
 
         return (
-          <button
+          <Link
             key={category.id}
-            type="button"
-            aria-pressed={isActive}
+            href={catalogHref(category.id, view)}
+            scroll={false}
+            aria-current={isActive ? "page" : undefined}
             data-active={isActive}
-            onClick={() => onSelect(category.id)}
             className={`group relative w-full flex flex-col items-center gap-1.5 py-3 px-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container ${
               isActive
                 ? "bg-surface-base rounded-l-2xl shadow-sm"
@@ -68,9 +75,9 @@ export function CategoryRail({ categories, activeCategory, onSelect }: CategoryR
             >
               {category.label}
             </span>
-          </button>
+          </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

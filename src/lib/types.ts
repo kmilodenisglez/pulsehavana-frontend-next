@@ -16,6 +16,11 @@ export interface Category {
   icon?: string;
   /** Optional category artwork (remote URL). */
   image?: string;
+  /**
+   * Tier 2 collections inside the category. Derived from the category tree so
+   * the explorer can caption its index rows without a second request.
+   */
+  collectionCount?: number;
 }
 
 /**

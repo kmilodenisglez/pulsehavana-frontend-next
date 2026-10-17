@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CollectionThumb } from "./CollectionThumb";
 import { Icon } from "./Icon";
 
@@ -12,7 +13,10 @@ export interface CollectionItem {
   icon?: string;
   image?: string;
   isActive: boolean;
-  onSelect: () => void;
+  /** Catalog URL this row opens (`?cat=<slug>`); a collection drops the view. */
+  href: string;
+  /** Side effect run with the navigation, e.g. leaving the explorer view. */
+  onSelect?: () => void;
 }
 
 export interface CollectionExplorerProps {
@@ -26,11 +30,13 @@ export interface CollectionExplorerProps {
 /**
  * Tier 2 collection list — detail half of the mobile/tablet catalog explorer.
  *
- * Rows behave as the subcategory filter, so the selected one is exposed with
- * `aria-pressed` and tinted with the brand violet instead of the solid fill
- * used by the desktop pills (a full-width solid row would be too heavy).
+ * Rows behave as the subcategory filter and are links to that collection's URL,
+ * so the selected one is exposed with `aria-current` and tinted with the brand
+ * violet instead of the solid fill used by the desktop pills (a full-width solid
+ * row would be too heavy).
+ *
  * From `md` up the rows flow into two columns so a tablet width is not a single
- * 700px-wide row with a long gap between the label and the affordance.
+ * 700px-wide row with a long gap between the thumbnail and the chevron.
  *
  * In the full-screen categories view the panel has a bounded height, so the
  * list scrolls on its own while the header stays visible.
@@ -57,12 +63,13 @@ export function CollectionExplorer({ title, countLabel, items }: CollectionExplo
            margin keeps the focus rings from being clipped by the scroll box. */
         <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-1 grid grid-cols-1 gap-2 content-start md:grid-cols-2">
           {items.map((item) => (
-            <button
+            <Link
               key={item.key}
-              type="button"
-              aria-pressed={item.isActive}
-              data-active={item.isActive}
+              href={item.href}
+              scroll={false}
               onClick={item.onSelect}
+              aria-current={item.isActive ? "page" : undefined}
+              data-active={item.isActive}
               className={`group w-full p-2.5 rounded-[16px] flex items-center justify-between gap-3 text-left transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container ${
                 item.isActive
                   ? "bg-primary-tint ring-1 ring-inset ring-primary-container/25"
@@ -100,7 +107,7 @@ export function CollectionExplorer({ title, countLabel, items }: CollectionExplo
                     : "text-ink-secondary group-hover:text-primary-container transition-colors"
                 }`}
               />
-            </button>
+            </Link>
           ))}
         </div>
       )}

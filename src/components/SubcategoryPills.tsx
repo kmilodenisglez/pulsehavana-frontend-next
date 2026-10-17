@@ -1,8 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { Icon } from "./Icon";
 import { PillScroller } from "./PillScroller";
 import { pluralize } from "@/lib/format";
+import { catalogHref } from "@/lib/store-catalog";
+import { useStoreView } from "@/lib/store-view";
 import type { Subcategory } from "@/lib/types";
 
 export interface SubcategoryPillsProps {
@@ -10,19 +13,20 @@ export interface SubcategoryPillsProps {
   parentLabel: string;
   subcategories: Subcategory[];
   activeSubcategory: string | null;
-  onSelect: (slug: string) => void;
 }
 
 /**
  * Tier 2 subcategory pills — desktop variant of the catalog filter, grouped
- * inside a card so the two levels stay visually distinct.
+ * inside a card so the two levels stay visually distinct. Each pill links to
+ * that collection's `?cat=<slug>` URL, so the whole filter is shareable.
  */
 export function SubcategoryPills({
   parentLabel,
   subcategories,
   activeSubcategory,
-  onSelect,
 }: SubcategoryPillsProps) {
+  const { view } = useStoreView();
+
   return (
     <div className="bg-surface-container-low/70 border border-border-hairline rounded-[20px] p-3 flex flex-col gap-2">
       <div className="flex items-center justify-between">
@@ -54,13 +58,13 @@ export function SubcategoryPills({
             : "subcat-pill flex items-center gap-2 h-9 px-3 rounded-full bg-surface-base border border-border-hairline text-ink-primary font-callout text-xs font-semibold whitespace-nowrap active:scale-[0.97] transition-all";
 
           return (
-            <button
+            <Link
               key={sub.slug}
-              type="button"
-              aria-pressed={isActive}
+              href={catalogHref(sub.slug, view)}
+              scroll={false}
+              aria-current={isActive ? "page" : undefined}
               data-active={isActive}
               className={pillClass}
-              onClick={() => onSelect(sub.slug)}
             >
               <Icon
                 name={sub.icon}
@@ -76,7 +80,7 @@ export function SubcategoryPills({
               >
                 {sub.count} disp.
               </span>
-            </button>
+            </Link>
           );
         })}
       </PillScroller>

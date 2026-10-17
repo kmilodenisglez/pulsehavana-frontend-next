@@ -106,17 +106,31 @@ project's "laptop / desktop" step):
 
 - The mobile/tablet view lives in `useStoreView` (`src/lib/store-view.ts`),
   backed by the URL hash (`#categorias`) like the cart is backed by
-  localStorage, and the catalog filters live in `useStoreFilters`
-  (`src/lib/store-filters.ts`) for the same reason: the catalog *and* the bottom
-  navigation change them. Desktop ignores the view: the shop view is
-  `hidden lg:flex` while the categories view is open and the categories view is
-  `lg:hidden`, so the pills never disappear on a wide screen.
+  localStorage. Desktop ignores the view: the shop view is `hidden lg:flex` while
+  the categories view is open and the categories view is `lg:hidden`, so the
+  pills never disappear on a wide screen. Switching the view is presentation
+  only: the `BottomNav` items `preventDefault()` so it never costs a server read,
+  and their `href` still points at the same view for sharing. Anything else that
+  closes the explorer must call `setStoreView("inicio")` — the router updates the
+  URL outside React's render, so a hash it drops never reaches the view store.
+- **The catalog selection is the URL**: `?cat=<slug>` (`catalogHref` in
+  `src/lib/store-catalog.ts`), where the slug is a Tier 1 category or a Tier 2
+  collection. The server resolves it (`getStoreCatalog` in
+  `src/lib/store-catalog.server.ts`, `use cache` + `cacheTag("category:<slug>")`),
+  so one URL = one query = one shareable link that renders the same products
+  before any JavaScript runs, and going back to a visited category is served from
+  cache instead of the database. Pills, rail and collection rows are `<Link>`s to
+  those URLs (`scroll={false}`): copyable, prefetchable, middle-clickable. An
+  unknown slug falls back to the whole catalog instead of an error page.
+- The URL data streams into the page's static shell through a `Suspense`
+  boundary (`StoreFrontSkeleton`), which is what Cache Components asks for;
+  without it the whole route would render per request.
 - `StoreHero` is the shop's home header: it shows only while the catalog is
-  unfiltered (`Todos`), so any active category (parent or collection) takes it
-  away and the products keep the screen. The "Inicio" item of the `BottomNav`
-  restores that state — it clears the filters, so the home tab always lands on
-  the whole catalog with the hero — and the categories view takes the hero away
-  with the shop itself.
+  unfiltered (`Todos`, i.e. no `?cat=`), so any active category (parent or
+  collection) takes it away and the products keep the screen. The "Inicio" item
+  of the `BottomNav` restores that state — its bare `/` path drops the filter, so
+  the home tab always lands on the whole catalog with the hero — and the
+  categories view takes the hero away with the shop itself.
 - A view that owns the screen is sized explicitly — `h-[calc(100dvh-10rem)]`,
   i.e. the page's own `pt-16` + `pb-24` — instead of `flex-1` + `min-h-0`: a
   `0%` flex basis resolves as *content* while the ancestor height is indefinite,
@@ -147,7 +161,10 @@ project's "laptop / desktop" step):
 | `src/components/ProductDetail.tsx` | Badges on light surfaces |
 | `src/components/StoreCategories.tsx` | Mobile & tablet categories view (full screen) |
 | `src/lib/store-view.ts` | Mobile & tablet view state (`inicio` / `categorias`) |
-| `src/lib/store-filters.ts` | Catalog filters (category / collection), shared with the bottom navigation |
+| `src/lib/store-catalog.ts` | Catalog selection types + `catalogHref` (the `?cat=<slug>` contract) |
+| `src/lib/store-catalog.server.ts` | Storefront query: `getStoreCatalog(?cat=)`, cached per category tag |
+| `src/app/page.tsx` | Reads `?cat=`, streams the store into the page's static shell |
+| `src/components/StoreFrontSkeleton.tsx` | Streaming fallback for the URL-resolved store body |
 | `src/components/CategoryRail.tsx` / `CollectionExplorer.tsx` | Mobile & tablet catalog explorer |
 | `src/components/CategoryPills.tsx` / `SubcategoryPills.tsx` | Desktop catalog pills |
 | `scripts/subset-material-symbols.py` | Regenerates the self-hosted icon font subset |
