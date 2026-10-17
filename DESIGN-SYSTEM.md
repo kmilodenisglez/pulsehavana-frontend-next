@@ -4,8 +4,6 @@
 > Humans and AI agents MUST follow it when writing or reviewing UI.
 >
 > **Source of truth for values:** `src/app/globals.css` (`@theme`).
-> **Source of truth for visual language:** the Brand Book
-> (`data_tmp/PULSE HAVANA CELL - Design/Design - Brand Book.md`, git-ignored).
 > This file explains **intent + usage rules**; if a value here disagrees with
 > `globals.css`, `globals.css` wins — fix this file.
 
