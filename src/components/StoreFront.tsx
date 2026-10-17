@@ -26,12 +26,15 @@ export function StoreFront() {
   const [activeSubcategory, setActiveSubcategory] = useState<string | null>(null);
   const { view, setView } = useStoreView();
   const isCategoriesView = view === "categorias";
+  // The hero is the root of the shop: it stays only while the catalog is
+  // unfiltered and steps aside as soon as a category or a collection is picked,
+  // leaving the products the whole screen. The categories view hides it too.
+  const isUnfiltered = activeCategory === INITIAL_CATEGORY && activeSubcategory === null;
 
   function selectCategory(categoryId: Category["id"]) {
     setActiveCategory(categoryId);
     // Picking a parent category clears the subcategory filter, i.e. "all of
-    // its subcategories". The hero therefore stays on screen until the shopper
-    // drills into one specific subcategory (or taps the active pill again).
+    // its subcategories".
     setActiveSubcategory(null);
   }
 
@@ -61,10 +64,8 @@ export function StoreFront() {
           keeps the scroll position and the already-loaded product imagery — but
           steps aside below `lg`, where the categories view owns the screen. */}
       <div className={`${isCategoriesView ? "hidden lg:flex" : "flex"} flex-col w-full`}>
-        {/* The hero is storefront-level marketing: it steps aside once the
-            shopper drills into a subcategory, leaving the catalog the whole
-            screen. */}
-        {activeSubcategory === null ? <StoreHero /> : null}
+        {/* Shop marketing: only the unfiltered root keeps it (see above). */}
+        {isUnfiltered ? <StoreHero /> : null}
         <StoreCatalog
           activeCategory={activeCategory}
           activeSubcategory={activeSubcategory}

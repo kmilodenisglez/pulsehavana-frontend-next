@@ -18,9 +18,8 @@ interface NavItem {
   icon: string;
   isActive: (context: NavContext) => boolean;
   /**
-   * View this item opens. "Inicio" and "Tienda" both land on the shop; "Tienda"
-   * keeps its own `#tienda` anchor (store info, the `TrustCard`) and is the hook
-   * a dedicated store view would take over later.
+   * View this item opens. "Inicio" is the shop and "Categorías" the full-screen
+   * explorer; the cart opens its own route and comes back to the shop.
    */
   view: StoreView;
 }
@@ -46,13 +45,6 @@ const items: NavItem[] = [
     icon: "shopping_bag",
     view: "inicio",
     isActive: ({ pathname }) => pathname.startsWith("/checkout"),
-  },
-  {
-    href: "/#tienda",
-    label: "Tienda",
-    icon: "store",
-    view: "inicio",
-    isActive: () => false,
   },
 ];
 

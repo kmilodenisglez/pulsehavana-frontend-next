@@ -78,9 +78,12 @@ export function StoreCatalog({
         )}
       </section>
 
-      {/* Barra de Contexto y Filtros (ProductFilterSet) */}
+      {/* Context & quick-filter bar (ProductFilterSet) */}
       <section className="px-margin pt-space-sm pb-1">
-        <div className="flex items-center justify-between bg-surface-container-lowest border border-border-hairline rounded-[16px] px-3.5 py-2.5 shadow-sm">
+        {/* Phones stack the quick filters under the breadcrumb: on one row they
+            took the width the context needs, which truncated it to
+            "Teléfonos → Sam…" and left the filter unreadable. */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between bg-surface-container-lowest border border-border-hairline rounded-[16px] px-3.5 py-2.5 shadow-sm">
           <div className="flex items-center gap-1.5 min-w-0">
             <Icon name={"filter_alt"} className="text-[18px] text-primary-container shrink-0" />
             <div className="flex flex-col min-w-0">
@@ -95,7 +98,7 @@ export function StoreCatalog({
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
             <button className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-tint text-primary-container font-label-compact text-[11px] font-semibold active:scale-[0.97] transition-all">
               <Icon name={"star"} className="text-[14px]" />
               <span>Destacados</span>

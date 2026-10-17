@@ -111,6 +111,10 @@ project's "laptop / desktop" step):
   localStorage. Desktop ignores it: the shop view is `hidden lg:flex` while the
   categories view is open and the categories view is `lg:hidden`, so the pills
   never disappear on a wide screen.
+- `StoreHero` is the shop's root: it shows only while the catalog is
+  unfiltered (`Todos`) and steps aside as soon as a parent category or a
+  collection is picked, so the products keep the screen. It never shows in the
+  categories view.
 - A view that owns the screen is sized explicitly — `h-[calc(100dvh-10rem)]`,
   i.e. the page's own `pt-16` + `pb-24` — instead of `flex-1` + `min-h-0`: a
   `0%` flex basis resolves as *content* while the ancestor height is indefinite,
