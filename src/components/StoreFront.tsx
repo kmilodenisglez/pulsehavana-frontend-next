@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { getMockSubcategories } from "@/lib/mockApi";
 import type { Category } from "@/lib/types";
 import { StoreCatalog } from "./StoreCatalog";
 import { StoreHero } from "./StoreHero";
@@ -19,10 +18,10 @@ export function StoreFront() {
 
   function selectCategory(categoryId: Category["id"]) {
     setActiveCategory(categoryId);
-    // A newly selected category opens on its first subcategory (index 0);
-    // categories without subcategories (e.g. "todos") fall back to null.
-    const [firstSubcategory] = getMockSubcategories(categoryId);
-    setActiveSubcategory(firstSubcategory?.slug ?? null);
+    // Picking a parent category clears the subcategory filter, i.e. "all of
+    // its subcategories". The hero therefore stays on screen until the shopper
+    // drills into one specific subcategory (or taps the active pill again).
+    setActiveSubcategory(null);
   }
 
   return (
