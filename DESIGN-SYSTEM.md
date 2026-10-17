@@ -102,7 +102,7 @@ project's "laptop / desktop" step):
 | Range | Shell | Categories & subcategories |
 | --- | --- | --- |
 | `< lg` (mobile & tablet) | `BottomNav` visible, pages clear it with `pb-24` | Two views driven by the bottom navigation. Shop view (`inicio`): no category chrome at all. Categories view (`categorias`): `StoreCategories` (`CategoryRail` + `CollectionExplorer`) fills the screen between the header and the nav. "Categorías" toggles: picked while open, it closes the view and gives the shop back with its filters untouched (only "Inicio" clears them) |
-| `≥ lg` (desktop) | `BottomNav` hidden, pages use `lg:pb-8` | Pill rows always inline: `CategoryPills` (Tier 1) + `SubcategoryPills` (Tier 2) |
+| `≥ lg` (desktop) | `BottomNav` hidden, pages use `lg:pb-8` | `DesktopCategoryNav`: the Tier 1 pills (`CategoryPills`) plus, for the pill that was clicked, the Tier 2 megamenu (`CategoryMenu`) that unfolds directly below the bar with the collections as a grid of artwork tiles |
 
 - The mobile/tablet view lives in `useStoreView` (`src/lib/store-view.ts`),
   backed by the URL hash (`#categorias`) like the cart is backed by
@@ -119,9 +119,26 @@ project's "laptop / desktop" step):
   `src/lib/store-catalog.server.ts`, `use cache` + `cacheTag("category:<slug>")`),
   so one URL = one query = one shareable link that renders the same products
   before any JavaScript runs, and going back to a visited category is served from
-  cache instead of the database. Pills, rail and collection rows are `<Link>`s to
-  those URLs (`scroll={false}`): copyable, prefetchable, middle-clickable. An
-  unknown slug falls back to the whole catalog instead of an error page.
+  cache instead of the database. Pills, rail, collection rows and megamenu tiles
+  are `<Link>`s to those URLs (`scroll={false}`): copyable, prefetchable,
+  middle-clickable. An unknown slug falls back to the whole catalog instead of an
+  error page.
+- **The desktop megamenu is presentation, never a second selection**. It lists
+  the collections the server sent *for the URL's selection*, so it is opened only
+  once that category's data is on screen (the nav remembers the clicked id until
+  the selection matches it), and a shared link never opens a menu. A pill whose
+  category is already resolved — the selection itself, or the parent of the
+  selected collection, whose collections travel in the same payload — opens with
+  `preventDefault()` and no request, which is what lets a shopper browse sibling
+  collections without dropping the filter they were on; a pill for any other
+  category follows its link, i.e. one query per category change. Its tiles land
+  on the shop (`setStoreView("inicio")` + close), while "Ver todo \<category\>"
+  keeps the view hash exactly like the rail does.
+- Closing the megamenu is three ways out and no dead end: the pill again, the
+  `bg-scrim` backdrop, or `Escape` (which also returns focus to the trigger).
+  Layering is fixed: the header stays at `z-50`, the nav is `z-40` and holds the
+  backdrop, so the bar + panel read as one floating card (`bg-surface-base`,
+  `rounded-[24px]`, `shadow-2xl`) over everything the page renders below it.
 - The URL data streams into the page's static shell through a `Suspense`
   boundary (`StoreFrontSkeleton`), which is what Cache Components asks for;
   without it the whole route would render per request.
@@ -166,7 +183,9 @@ project's "laptop / desktop" step):
 | `src/app/page.tsx` | Reads `?cat=`, streams the store into the page's static shell |
 | `src/components/StoreFrontSkeleton.tsx` | Streaming fallback for the URL-resolved store body |
 | `src/components/CategoryRail.tsx` / `CollectionExplorer.tsx` | Mobile & tablet catalog explorer |
-| `src/components/CategoryPills.tsx` / `SubcategoryPills.tsx` | Desktop catalog pills |
+| `src/components/DesktopCategoryNav.tsx` | Desktop nav: Tier 1 pills + Tier 2 megamenu (open state, backdrop, Escape) |
+| `src/components/CategoryPills.tsx` / `CategoryMenu.tsx` | Desktop Tier 1 trigger bar / Tier 2 megamenu panel |
+| `src/components/CollectionThumb.tsx` | Artwork tile with Material Symbol fallback (rail, explorer rows, megamenu grid) |
 | `scripts/subset-material-symbols.py` | Regenerates the self-hosted icon font subset |
 | `tokens.json` | Machine-readable token mirror (DTCG) — **generated** |
 | `scripts/export-design-tokens.mjs` | Exports `globals.css` → `tokens.json` |

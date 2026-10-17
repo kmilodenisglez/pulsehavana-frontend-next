@@ -26,7 +26,10 @@ import type { Category } from "./types";
  *
  * Backend wiring: the two `mockApi` reads below are the seam. Replace them with
  * `GET /api/v1/categories/` and `GET /api/v1/products/?category=<slug>` when the
- * Django API answers; the shapes (`StoreCatalogData`) stay as they are.
+ * Django API answers; the shapes (`StoreCatalogData`) stay as they are. The
+ * category list has to carry each category's collection count
+ * (`Category.collectionCount`): the explorer captions and the megamenu trigger
+ * both read it to know which categories have a Tier 2 level.
  */
 
 /** Cache tag for `revalidateTag(CATALOG_CACHE_TAG)` when the catalog changes. */
