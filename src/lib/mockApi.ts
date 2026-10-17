@@ -4,7 +4,7 @@
  * To switch to real backend: replace import in StoreCatalog.tsx
  * and change the fetch URLs from /api/v1/ to the real endpoint.
  */
-import type { Category, Product } from "./types";
+import type { Category, Product, Subcategory } from "./types";
 
 /** Base URL for images (same as real catalog) */
 const PUBLIC = "https://lh3.googleusercontent.com/aida-public";
@@ -661,24 +661,62 @@ export const mockProductsByFilter = {
   ],
 };
 
-/** Get categories tree (mimics /api/v1/categories/). Plain function, not a hook. */
+/** Material Symbol fallback per collection, used when the API sends no artwork. */
+const SUBCATEGORY_ICONS: Record<string, string> = {
+  Apple: "phone_iphone",
+  Samsung: "android",
+  Xiaomi: "devices",
+  Google: "mobile_friendly",
+  Inversores: "electrical_services",
+  "Baterías Litio": "battery_charging_full",
+  "Paneles Solares": "solar_power",
+  "Accesorios Solares": "cable",
+  "Cargadores & Cables": "power",
+  "Fundas & Micas": "smartphone",
+  "Audio & Airpods": "headphones",
+};
+
+/** First artwork found in a category, reused as the category tile. */
+function categoryArtwork(slug: string): string | undefined {
+  return mockCategoriesTree
+    .find((category) => category.slug === slug)
+    ?.subcategories.find((subcategory) => subcategory.image)?.image;
+}
+
+/**
+ * Get categories (Tier 1) (mimics /api/v1/categories/).
+ * Includes the "Todos" pseudo-category plus one tile per parent category.
+ */
 export function getMockCategories(): Category[] {
-  // Transform mockCategoriesTree to Category[] format
   const result: Category[] = [
-    { id: "todos", label: "Todos" },
-    { id: "telefonos", label: "Teléfonos" },
-    { id: "energia", label: "Energía & Respaldo" },
-    { id: "accesorios", label: "Audio & Accesorios" },
+    { id: "todos", label: "Todos", icon: "grid_view" },
+    {
+      id: "telefonos",
+      label: "Teléfonos",
+      icon: "smartphone",
+      image: categoryArtwork("telefonos"),
+    },
+    {
+      id: "energia",
+      label: "Energía & Respaldo",
+      icon: "battery_charging_full",
+      image: categoryArtwork("energia"),
+    },
+    {
+      id: "accesorios",
+      label: "Audio & Accesorios",
+      icon: "headphones",
+      image: categoryArtwork("accesorios"),
+    },
   ];
   return result;
 }
 
 /** Get subcategories for a category (mimics /api/v1/categories/{slug}/subcategories/). Plain function, not a hook. */
-export function getMockSubcategories(categorySlug: string) {
+export function getMockSubcategories(categorySlug: string): Subcategory[] {
   const category = mockCategoriesTree.find((c) => c.slug === categorySlug);
   if (!category) return [];
 
-  // Transform to the format expected by StoreCatalog
   return category.subcategories.map((sub) => {
     const count = mockProductsByFilter.todos.filter(
       (product) => product.category === categorySlug && product.subcategory === sub.slug,
@@ -688,14 +726,8 @@ export function getMockSubcategories(categorySlug: string) {
       name: sub.name,
       slug: sub.slug,
       count,
-      icon:
-        sub.name === "Apple"
-          ? "phone_iphone"
-          : sub.name === "Samsung"
-          ? "android"
-          : sub.name === "Xiaomi"
-          ? "devices"
-          : "mobile_friendly",
+      icon: SUBCATEGORY_ICONS[sub.name] ?? "category",
+      image: sub.image,
     };
   });
 }

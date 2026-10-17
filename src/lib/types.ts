@@ -12,6 +12,25 @@ export type CategoryId =
 export interface Category {
   id: CategoryId;
   label: string;
+  /** Material Symbol used as the category tile when it has no artwork. */
+  icon?: string;
+  /** Optional category artwork (remote URL). */
+  image?: string;
+}
+
+/**
+ * Tier 2 collection inside a category.
+ * Mirrors `GET /categories/{slug}/subcategories/`.
+ */
+export interface Subcategory {
+  name: string;
+  slug: string;
+  /** Products currently available in the collection. */
+  count: number;
+  /** Material Symbol used as the collection tile when it has no artwork. */
+  icon: string;
+  /** Optional collection artwork (remote URL). */
+  image?: string;
 }
 
 export type BadgeKind = "success" | "primary" | "neutral";

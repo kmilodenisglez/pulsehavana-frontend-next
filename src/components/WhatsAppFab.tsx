@@ -9,7 +9,7 @@ export function WhatsAppFab() {
   const { whatsappNumber } = useStoreConfig();
 
   return (
-    <aside className="fixed bottom-20 right-4 z-40">
+    <aside className="fixed bottom-20 right-4 z-40 lg:bottom-6">
       <a
         aria-label="Contactar soporte vía WhatsApp"
         href={buildWhatsAppLink(whatsappNumber)}

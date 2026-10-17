@@ -1,25 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
+import { CategoryPills } from "./CategoryPills";
 import { Icon } from "./Icon";
-import { PillScroller } from "./PillScroller";
 import { ProductCard } from "./ProductCard";
+import { SubcategoryPills } from "./SubcategoryPills";
 import type { Category } from "@/lib/types";
 import { getMockCategories, getMockProducts, getMockSubcategories } from "@/lib/mockApi";
-
-// --- Mock configuration ---
-// Human-readable labels for the parent categories.
-const CATEGORY_LABELS: Record<Category["id"], string> = {
-  todos: "Todos",
-  telefonos: "Teléfonos",
-  energia: "Energía & Respaldo",
-  accesorios: "Audio & Accesorios",
-  "apple-iphone": "Apple iPhone",
-  "samsung-galaxy": "Samsung Galaxy",
-  xiaomi: "Xiaomi",
-  "panel-solar": "Panel Solar",
-  "estacion-energia": "Estación de Energía",
-};
 
 export interface StoreCatalogProps {
   activeCategory: Category["id"];
@@ -30,6 +17,11 @@ export interface StoreCatalogProps {
 
 // The filter state lives in `StoreFront`, which also decides whether the hero
 // is still visible; the catalog stays a presentational consumer of that state.
+//
+// Category chrome here is desktop-only: from `lg` up both tiers are pill rows
+// (`CategoryPills` + `SubcategoryPills`). Below `lg` the categories are a view
+// of their own (`StoreCategories`), opened from the bottom navigation, so the
+// shop itself renders without them at those widths.
 export function StoreCatalog({
   activeCategory,
   activeSubcategory,
@@ -55,107 +47,36 @@ export function StoreCatalog({
     [activeCategory],
   );
 
-  const parentLabel = CATEGORY_LABELS[activeCategory];
+  const isAllCategories = activeCategory === "todos";
+  const parentLabel =
+    categories.find((category) => category.id === activeCategory)?.label ?? activeCategory;
   const activeSub = subcategories.find((sub) => sub.slug === activeSubcategory) ?? null;
 
-  const breadcrumb = activeSub
-    ? `${parentLabel} → ${activeSub.name} (${activeSub.count} productos sincronizados)`
-    : parentLabel;
+  // The product count already is the supporting line below, so the breadcrumb
+  // keeps just the path — it is the only filter indicator the mobile shop view
+  // has, and it has to fit one line there.
+  const breadcrumb = activeSub ? `${parentLabel} → ${activeSub.name}` : parentLabel;
 
   return (
     <>
-      {/* Level 1: Categorías Principales */}
-      <section id="categories" className="w-full py-space-sm">
-        <PillScroller
-          activeKey={activeCategory}
-          className="flex items-center gap-2 overflow-x-auto px-margin md:px-margin-desktop scrollbar-none no-scrollbar py-0.5"
-        >
-          {categories.map((category) => {
-            const isActive = activeCategory === category.id;
-            return (
-              <button
-                key={category.id}
-                type="button"
-                aria-pressed={isActive}
-                data-active={isActive}
-                onClick={() => {
-                  onSelectCategory(category.id);
-                }}
-                className={`flex items-center justify-center h-10 px-5 rounded-full font-callout text-sm font-semibold whitespace-nowrap active:scale-[0.97] transition-all duration-100 ${
-                  isActive
-                    ? "bg-primary-container text-on-primary shadow-sm"
-                    : "bg-surface-container-high text-ink-secondary"
-                }`}
-              >
-                {category.label}
-              </button>
-            );
-          })}
-        </PillScroller>
-      </section>
-
-      {/* Level 2: Subcategorías Dinámicas */}
-      {activeCategory !== "todos" && subcategories.length > 0 && (
-        <section className="px-margin pt-1">
-          <div className="bg-surface-container-low/70 border border-border-hairline rounded-[20px] p-3 flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Icon name={"account_tree"} className="text-[16px] text-primary-container" />
-                <span className="font-label-compact text-[11px] text-ink-primary font-bold uppercase tracking-wider">
-                  Subcategorías de
-                  <span className="ml-1 text-primary-container" id="currentParentLabel">
-                    {parentLabel}
-                  </span>
-                </span>
-              </div>
-              <span
-                className="font-label-compact text-[11px] text-ink-secondary font-medium"
-                id="subcategorySummary"
-              >
-                {activeCategory === "telefonos" ? "4 marcas disponibles" : "3 subcategorías"}
-              </span>
-            </div>
-            <PillScroller
-              activeKey={activeSubcategory}
-              id="subcategoriesContainer"
-              className="flex items-center gap-2 overflow-x-auto scrollbar-none no-scrollbar py-0.5"
-            >
-              {subcategories.map((sub) => {
-                const isActive = activeSubcategory === sub.slug;
-                const pillClass = isActive
-                  ? "subcat-pill active flex items-center gap-2 h-9 px-3 rounded-full bg-primary-container text-on-primary font-callout text-xs font-semibold whitespace-nowrap shadow-sm active:scale-[0.97] transition-all"
-                  : "subcat-pill flex items-center gap-2 h-9 px-3 rounded-full bg-surface-base border border-border-hairline text-ink-primary font-callout text-xs font-semibold whitespace-nowrap active:scale-[0.97] transition-all";
-
-                return (
-                  <button
-                    key={sub.slug}
-                    type="button"
-                    aria-pressed={isActive}
-                    data-active={isActive}
-                    className={pillClass}
-                    onClick={() => onSelectSubcategory(sub.slug)}
-                  >
-                    <Icon
-                      name={sub.icon}
-                      className={isActive ? "text-[16px] text-on-primary" : "text-[16px] text-ink-secondary"}
-                    />
-                    <span>{sub.name}</span>
-                    <span
-                      className={
-                        isActive
-                          ? "px-1.5 py-0.2 bg-white/20 rounded-full font-label-compact text-[10px] leading-tight font-bold text-on-primary"
-                          : "px-1.5 py-0.2 bg-surface-container-high text-ink-secondary rounded-full font-label-compact text-[10px] leading-tight font-bold"
-                      }
-                    >
-                      {sub.count} disp.
-                    </span>
-                  </button>
-                );
-              })}
-            </PillScroller>
+      {/* Tier 1 + Tier 2: categories and subcategories (desktop only) */}
+      <section className="hidden lg:block w-full py-space-sm">
+        <CategoryPills
+          categories={categories}
+          activeCategory={activeCategory}
+          onSelect={onSelectCategory}
+        />
+        {!isAllCategories && subcategories.length > 0 && (
+          <div className="px-margin pt-1">
+            <SubcategoryPills
+              parentLabel={parentLabel}
+              subcategories={subcategories}
+              activeSubcategory={activeSubcategory}
+              onSelect={onSelectSubcategory}
+            />
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Barra de Contexto y Filtros (ProductFilterSet) */}
       <section className="px-margin pt-space-sm pb-1">
@@ -200,7 +121,7 @@ export function StoreCatalog({
 
         {products.length === 0 ? (
           <div className="col-span-full pt-8 text-center">
-            <Icon name={"inventory_2"} className="text-[48px] text-primary-container" />
+            <Icon name={"inventory_two"} className="text-[48px] text-primary-container" />
             <p className="font-callout text-callout text-ink-primary mt-2">
               Sin equipos en esta categoría
             </p>

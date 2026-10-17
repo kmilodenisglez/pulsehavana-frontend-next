@@ -96,7 +96,41 @@ it reads as secondary and never duplicates the primary violet.
 
 ---
 
-## 5. Related files
+## 5. Responsive contract
+
+The storefront has exactly two layout families, switched at `lg` (1024px, the
+project's "laptop / desktop" step):
+
+| Range | Shell | Categories & subcategories |
+| --- | --- | --- |
+| `< lg` (mobile & tablet) | `BottomNav` visible, pages clear it with `pb-24` | Two views driven by the bottom navigation. Shop view (`inicio`): no category chrome at all. Categories view (`categorias`): `StoreCategories` (`CategoryRail` + `CollectionExplorer`) fills the screen between the header and the nav |
+| `≥ lg` (desktop) | `BottomNav` hidden, pages use `lg:pb-8` | Pill rows always inline: `CategoryPills` (Tier 1) + `SubcategoryPills` (Tier 2) |
+
+- The mobile/tablet view lives in `useStoreView` (`src/lib/store-view.ts`),
+  backed by the URL hash (`#categorias`) like the cart is backed by
+  localStorage. Desktop ignores it: the shop view is `hidden lg:flex` while the
+  categories view is open and the categories view is `lg:hidden`, so the pills
+  never disappear on a wide screen.
+- A view that owns the screen is sized explicitly — `h-[calc(100dvh-10rem)]`,
+  i.e. the page's own `pt-16` + `pb-24` — instead of `flex-1` + `min-h-0`: a
+  `0%` flex basis resolves as *content* while the ancestor height is indefinite,
+  so the view would grow the page instead of scrolling inside it. Each half then
+  opts into `overflow-y-auto` (`CategoryRail`, the `CollectionExplorer` rows), so
+  only the list scrolls and the header of the panel stays put.
+- Exactly one anchor `id` per target — `id="categorias"` belongs to the
+  categories view; variants are toggled with `lg:hidden` / `hidden lg:block`
+  and never duplicate an `id`.
+- When shell visibility changes, update the matching page padding in the same
+  change so no dead space is left behind (e.g. `BottomNav` + `lg:pb-8`).
+- Icons are ligatures from a **subset** font: adding an icon name requires
+  re-running `python3 scripts/subset-material-symbols.py` and committing the
+  regenerated `src/app/fonts/material-symbols-outlined.woff2`. A missing ligature
+  silently renders as literal text instead of a glyph (this font names the
+  "inventory 2" icon `inventory_two`, not `inventory_2`).
+
+---
+
+## 6. Related files
 
 | File | Responsibility |
 | --- | --- |
@@ -105,13 +139,18 @@ it reads as secondary and never duplicates the primary violet.
 | `src/lib/types.ts` | `BadgeKind` (`"success" \| "primary" \| "neutral"`) |
 | `src/components/ProductCard.tsx` | Badges over product imagery |
 | `src/components/ProductDetail.tsx` | Badges on light surfaces |
+| `src/components/StoreCategories.tsx` | Mobile & tablet categories view (full screen) |
+| `src/lib/store-view.ts` | Mobile & tablet view state (`inicio` / `categorias`) |
+| `src/components/CategoryRail.tsx` / `CollectionExplorer.tsx` | Mobile & tablet catalog explorer |
+| `src/components/CategoryPills.tsx` / `SubcategoryPills.tsx` | Desktop catalog pills |
+| `scripts/subset-material-symbols.py` | Regenerates the self-hosted icon font subset |
 | `tokens.json` | Machine-readable token mirror (DTCG) — **generated** |
 | `scripts/export-design-tokens.mjs` | Exports `globals.css` → `tokens.json` |
 | `data_tmp/…/Design - Brand Book.md` | Visual language reference (git-ignored) |
 
 ---
 
-## 6. Note for AI agents
+## 7. Note for AI agents
 
 When styling UI in this repo: read this file first, prefer the tokens/helpers it
 points to, and reject any change that introduces an off-brand hue into product

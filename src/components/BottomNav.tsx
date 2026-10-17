@@ -4,35 +4,77 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "./Icon";
 import { useCart } from "@/lib/cart";
+import { useStoreView, type StoreView } from "@/lib/store-view";
+
+interface NavContext {
+  pathname: string;
+  /** View the storefront shows on mobile & tablet (desktop ignores it). */
+  view: StoreView;
+}
 
 interface NavItem {
   href: string;
   label: string;
   icon: string;
-  isActive: (pathname: string) => boolean;
+  isActive: (context: NavContext) => boolean;
+  /**
+   * View this item opens. "Inicio" and "Tienda" both land on the shop; "Tienda"
+   * keeps its own `#tienda` anchor (store info, the `TrustCard`) and is the hook
+   * a dedicated store view would take over later.
+   */
+  view: StoreView;
 }
 
 const items: NavItem[] = [
-  { href: "/", label: "Inicio", icon: "home", isActive: (p) => p === "/" },
-  { href: "/#categories", label: "Categorías", icon: "grid_view", isActive: () => false },
+  {
+    href: "/",
+    label: "Inicio",
+    icon: "home",
+    view: "inicio",
+    isActive: ({ pathname, view }) => pathname === "/" && view === "inicio",
+  },
+  {
+    href: "/#categorias",
+    label: "Categorías",
+    icon: "grid_view",
+    view: "categorias",
+    isActive: ({ pathname, view }) => pathname === "/" && view === "categorias",
+  },
   {
     href: "/checkout",
     label: "Carrito",
     icon: "shopping_bag",
-    isActive: (p) => p.startsWith("/checkout"),
+    view: "inicio",
+    isActive: ({ pathname }) => pathname.startsWith("/checkout"),
   },
-  { href: "/#tienda", label: "Tienda", icon: "store", isActive: () => false },
+  {
+    href: "/#tienda",
+    label: "Tienda",
+    icon: "store",
+    view: "inicio",
+    isActive: () => false,
+  },
 ];
 
+/**
+ * Bottom navigation for mobile & tablet. Hidden from `lg` up, where the desktop
+ * chrome takes over (pages compensate with `lg:pb-8`).
+ *
+ * It also drives the storefront views: "Categorías" opens the full-screen
+ * categories view and "Inicio" brings the shop back without it (see
+ * `useStoreView`). Both the click and the `href` change the view, so the items
+ * keep working from other routes — e.g. the product page — without extra code.
+ */
 export function BottomNav() {
   const pathname = usePathname();
   const { count } = useCart();
+  const { view, setView } = useStoreView();
 
   return (
-    <nav className="fixed bottom-0 w-full z-50 pb-safe bg-chrome-translucent backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
+    <nav className="fixed bottom-0 w-full z-50 pb-safe bg-chrome-translucent backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)] lg:hidden">
       <div className="flex items-center justify-around h-16 px-space-sm mx-auto w-full max-w-[1280px]">
         {items.map((item) => {
-          const active = item.isActive(pathname);
+          const active = item.isActive({ pathname, view });
           const showBadge = item.icon === "shopping_bag" && count > 0;
 
           return (
@@ -40,6 +82,7 @@ export function BottomNav() {
               key={item.label}
               href={item.href}
               aria-current={active ? "page" : undefined}
+              onClick={() => setView(item.view)}
               className={`flex flex-col items-center justify-center flex-1 h-12 transition-colors duration-150 active:scale-[0.97] ${
                 active ? "text-primary-container font-semibold" : "text-ink-secondary"
               }`}
