@@ -2,7 +2,10 @@ import { Icon } from "./Icon";
 
 export function StoreHero() {
   return (
-    <section className="px-margin md:px-margin-desktop pt-space-md pb-space-sm flex flex-col gap-space-sm">
+    <section
+      data-reveal
+      className="px-margin md:px-margin-desktop pt-space-md pb-space-sm flex flex-col gap-space-sm"
+    >
       <div className="relative overflow-hidden rounded-[20px] bg-surface-container-lowest p-space-lg shadow-sm flex flex-col justify-between min-h-[190px]">
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary-tint rounded-full blur-2xl pointer-events-none" />
         <div className="relative z-10 flex flex-col gap-space-xs">

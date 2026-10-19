@@ -10,6 +10,13 @@ const HOLD_MS = 140;
 const EXIT_MS = 650;
 
 /**
+ * Extra time the content keeps its reveal choreography after the curtain has
+ * left (0.6s animation + the last grid step). Keep in sync with the
+ * `data-reveal` block in `globals.css`.
+ */
+const REVEAL_TAIL_MS = 900;
+
+/**
  * Brand intro — the storefront's loading screen.
  *
  * It is mounted once by the root layout, so it covers the very first paint of a
@@ -50,6 +57,11 @@ export function LoadingScreen() {
     // Hold the page still while the curtain is down, then hand scrolling back.
     root.style.overflow = "hidden";
 
+    // The page is already rendered behind the curtain; this attribute tells the
+    // `data-reveal` pieces in `globals.css` to wait, then rise in a stagger as
+    // the curtain slides away. Without it (no JS, reduced motion) nothing hides.
+    root.dataset.intro = "running";
+
     const startedAt = performance.now();
     let frame = 0;
     let exitTimer = 0;
@@ -73,7 +85,10 @@ export function LoadingScreen() {
         frame = requestAnimationFrame(tick);
         return;
       }
-      exitTimer = window.setTimeout(() => setLeaving(true), HOLD_MS);
+      exitTimer = window.setTimeout(() => {
+        root.dataset.intro = "revealing";
+        setLeaving(true);
+      }, HOLD_MS);
     };
 
     frame = requestAnimationFrame(tick);
@@ -82,19 +97,27 @@ export function LoadingScreen() {
       cancelAnimationFrame(frame);
       window.clearTimeout(exitTimer);
       root.style.overflow = previousOverflow;
+      delete root.dataset.intro;
     };
   }, []);
 
   // Drop the layer once the curtain has finished sliding away, and hand the
   // page back: the component stays mounted (it returns `null`), so the lock is
-  // released here instead of in the ramp's unmount cleanup.
+  // released here instead of in the ramp's unmount cleanup. The reveal keeps
+  // its attribute a little longer so the staggered cards can finish.
   useEffect(() => {
     if (!leaving) return;
     const timer = window.setTimeout(() => {
       document.documentElement.style.overflow = "";
       setGone(true);
     }, EXIT_MS);
-    return () => window.clearTimeout(timer);
+    const revealTimer = window.setTimeout(() => {
+      delete document.documentElement.dataset.intro;
+    }, EXIT_MS + REVEAL_TAIL_MS);
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(revealTimer);
+    };
   }, [leaving]);
 
   if (gone) return null;

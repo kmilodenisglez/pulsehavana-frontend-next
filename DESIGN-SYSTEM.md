@@ -50,6 +50,14 @@ palette as the page it hands over to. Its choreography is a token too
 at the bottom of `globals.css`), so the intro is CSS and never depends on an
 animation library.
 
+The handover is a **content reveal** owned by the same CSS block: while the intro
+runs it sets `data-intro` on `<html>`; elements marked `data-reveal` wait at
+opacity 0 and rise when the curtain leaves, reading `--intro-delay` (a Tailwind
+arbitrary property such as `[--intro-delay:60ms]`). A `data-reveal-grid` staggers
+its own children (120 ms, +40 ms per card up to the eighth). Without the attribute
+— no JS, reduced motion, or after the intro — nothing is hidden, so content is
+never trapped behind a failed animation.
+
 ---
 
 ## 2. Product badge palette (semantic variant) — added 2026-10

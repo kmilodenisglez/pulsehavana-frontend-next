@@ -27,7 +27,7 @@ export function StoreCatalog({ data }: StoreCatalogProps) {
       <DesktopCategoryNav categories={categories} selection={selection} />
 
       {/* Context & quick-filter bar (ProductFilterSet) */}
-      <section className="px-margin pt-space-sm pb-1">
+      <section data-reveal className="px-margin pt-space-sm pb-1 [--intro-delay:60ms]">
         {/* Phones stack the quick filters under the breadcrumb: on one row they
             took the width the context needs, which truncated it to
             "Teléfonos → Sam…" and left the filter unreadable. */}
@@ -61,7 +61,7 @@ export function StoreCatalog({ data }: StoreCatalogProps) {
 
       {/* Grid de Productos ALINEADO AL ProductListSerializer */}
       <section className="px-margin py-space-sm">
-        <div className="flex items-center justify-between pb-space-xs">
+        <div data-reveal className="flex items-center justify-between pb-space-xs [--intro-delay:90ms]">
           <h2 className="font-headline text-[18px] text-ink-primary font-bold tracking-tight">
             Resultados de Catálogo
           </h2>
@@ -71,7 +71,7 @@ export function StoreCatalog({ data }: StoreCatalogProps) {
         </div>
 
         {products.length === 0 ? (
-          <div className="col-span-full pt-8 text-center">
+          <div data-reveal className="col-span-full pt-8 text-center [--intro-delay:120ms]">
             <Icon name={"inventory_two"} className="text-[48px] text-primary-container" />
             <p className="font-callout text-callout text-ink-primary mt-2">
               Sin equipos en esta categoría
@@ -81,7 +81,10 @@ export function StoreCatalog({ data }: StoreCatalogProps) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 mt-space-xs sm:grid-cols-3 lg:grid-cols-4">
+          <div
+            data-reveal-grid
+            className="grid grid-cols-2 gap-3 mt-space-xs sm:grid-cols-3 lg:grid-cols-4"
+          >
             {products.map((product) => (
               <ProductCard key={product.slug} product={product} />
             ))}
