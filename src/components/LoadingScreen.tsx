@@ -18,10 +18,11 @@ const EXIT_MS = 650;
  * `StoreFrontSkeleton`); this layer only owns the moment before the curtain
  * slides up.
  *
- * Composition, bottom to top: night surface → brand glow → pulse ring → logo →
- * wordmark + counter → progress line. The counter is painted straight onto the
- * refs from a single `requestAnimationFrame` ramp (no re-render per frame); the
- * intro choreography is CSS (`--animate-intro-*` in `globals.css`).
+ * Composition, bottom to top: surface → brand bloom → pulse ring → logo →
+ * wordmark + counter → progress line. It uses the same light surface as the
+ * page, so the curtain hands over without a colour jump. The counter is painted
+ * straight onto the refs from a single `requestAnimationFrame` ramp (no re-render
+ * per frame); the intro choreography is CSS (`--animate-intro-*` in `globals.css`).
  *
  * Accessibility: the OS motion preference removes the intro entirely (CSS hides
  * it before hydration, and the effect stops the timers), and `<noscript>` also
@@ -107,7 +108,7 @@ export function LoadingScreen() {
       <div
         data-loading-screen
         role="status"
-        className="fixed inset-0 z-[100] overflow-hidden bg-night motion-reduce:hidden"
+        className="fixed inset-0 z-[100] overflow-hidden bg-surface motion-reduce:hidden"
         style={{
           transition: `transform ${EXIT_MS}ms cubic-bezier(0.76, 0, 0.24, 1)`,
           transform: leaving ? "translateY(-100%)" : undefined,
@@ -115,14 +116,14 @@ export function LoadingScreen() {
       >
         <span className="sr-only">Cargando la tienda…</span>
 
-        {/* Brand glow behind the mark: a tight bloom, so the field around it
-            stays night-black like the rest of the curtain. */}
+        {/* Brand bloom behind the mark: a soft violet breath on the light
+            surface, so the intro stays branded without tinting the whole page. */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 opacity-60"
+          className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 50% 41%, var(--color-night-glow) 0%, transparent 46%)",
+              "radial-gradient(ellipse at 50% 41%, var(--color-primary-tint) 0%, transparent 55%)",
           }}
         />
 
@@ -132,12 +133,12 @@ export function LoadingScreen() {
         >
           {/* Logo + pulse ring */}
           <div className="relative flex h-40 w-40 items-center justify-center sm:h-48 sm:w-48">
-            <span className="absolute inset-0 rounded-full border border-primary-fixed/40 animate-intro-ring" />
+            <span className="absolute inset-0 rounded-full border border-primary-container/30 animate-intro-ring" />
             <span
-              className="absolute -inset-3 rounded-full opacity-50"
+              className="absolute -inset-3 rounded-full"
               style={{
                 background:
-                  "radial-gradient(circle, var(--color-night-glow) 0%, transparent 70%)",
+                  "radial-gradient(circle, var(--color-primary-tint-hover) 0%, transparent 70%)",
               }}
             />
             <div className="relative h-24 w-24 sm:h-28 sm:w-28 animate-intro-logo">
@@ -155,13 +156,13 @@ export function LoadingScreen() {
           {/* Wordmark + counter */}
           <div className="mt-10 flex w-full max-w-sm items-end justify-between sm:mt-12">
             <div className="flex flex-col animate-intro-rise [animation-delay:320ms]">
-              <span className="font-label-compact text-label-compact uppercase tracking-widest text-primary-fixed/70">
+              <span className="font-label-compact text-label-compact uppercase tracking-widest text-primary-container">
                 Pulse
               </span>
-              <span className="mt-1 font-headline text-headline tracking-widest text-on-primary">
+              <span className="mt-1 font-headline text-headline tracking-widest text-ink-primary">
                 HAVANA
               </span>
-              <span className="mt-1 font-label-compact text-label-compact uppercase tracking-widest text-primary-fixed/50">
+              <span className="mt-1 font-label-compact text-label-compact uppercase tracking-widest text-ink-secondary">
                 Tecnología · Cuba
               </span>
             </div>
@@ -170,29 +171,29 @@ export function LoadingScreen() {
               <div className="flex items-baseline gap-1">
                 <span
                   ref={counterRef}
-                  className="font-title text-title tabular-nums text-on-primary"
+                  className="font-title text-title tabular-nums text-ink-primary"
                 >
                   000
                 </span>
-                <span className="font-caption text-caption text-primary-fixed/60">
+                <span className="font-caption text-caption text-ink-secondary">
                   %
                 </span>
               </div>
-              <span className="mt-1 font-label-compact text-label-compact uppercase tracking-widest text-primary-fixed/50">
+              <span className="mt-1 font-label-compact text-label-compact uppercase tracking-widest text-ink-secondary">
                 Cargando
               </span>
             </div>
           </div>
 
           {/* Progress line */}
-          <div className="mt-6 h-[2px] w-full max-w-sm overflow-hidden bg-primary-fixed/15 animate-intro-rise [animation-delay:420ms]">
+          <div className="mt-6 h-[2px] w-full max-w-sm overflow-hidden bg-primary-container/10 animate-intro-rise [animation-delay:420ms]">
             <div
               ref={barRef}
               className="h-full w-full origin-left"
               style={{
                 transform: "scaleX(0)",
                 background:
-                  "linear-gradient(90deg, var(--color-primary-fixed-dim) 0%, var(--color-primary-fixed) 100%)",
+                  "linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary-container) 100%)",
               }}
             />
           </div>

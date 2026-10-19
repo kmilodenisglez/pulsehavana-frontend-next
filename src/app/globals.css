@@ -80,12 +80,8 @@
   --color-ink-primary: #1d1d1f;
   --color-ink-secondary: #6e6e73;
 
-  /* Brand intro — the one dark, cinematic surface (LoadingScreen). The rest of
-     the storefront is light; this is the brand moment before the shop shows. */
-  --color-night: #0b0614;
-  --color-night-glow: rgba(124, 58, 237, 0.35);
-
-  /* Intro choreography (LoadingScreen): logo drop-in, pulse ring, copy rise. */
+  /* Intro choreography (LoadingScreen): logo drop-in, pulse ring, copy rise.
+     The intro paints with surface + primary tints, like the rest of the shop. */
   --animate-intro-logo: intro-logo 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
   --animate-intro-ring: intro-ring 2.2s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
   --animate-intro-rise: intro-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
