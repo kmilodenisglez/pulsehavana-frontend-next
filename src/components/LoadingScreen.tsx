@@ -186,7 +186,7 @@ export function LoadingScreen() {
           </div>
 
           {/* Progress line */}
-          <div className="mt-6 h-[2px] w-full max-w-sm overflow-hidden bg-primary-container/10 animate-intro-rise [animation-delay:420ms]">
+          <div className="mt-6 h-[2px] w-full max-w-sm overflow-hidden bg-primary-container/15 animate-intro-rise [animation-delay:420ms]">
             <div
               ref={barRef}
               className="h-full w-full origin-left"
