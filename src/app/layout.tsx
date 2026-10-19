@@ -5,6 +5,7 @@ import "./globals.css";
 import { CartProvider } from "@/lib/cart";
 import { StoreConfigProvider } from "@/lib/store-config-provider";
 import { getStoreConfig } from "@/lib/store-config.server";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -48,6 +49,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${inter.variable} ${materialSymbols.variable} h-full`}>
       <body className="bg-surface font-body text-body text-ink-primary min-h-screen flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+        {/* Brand intro: covers the first paint of a document and takes itself
+            out of the tree; client-side navigation never sees it again. */}
+        <LoadingScreen />
         <StoreConfigProvider config={storeConfig}>
           <CartProvider>{children}</CartProvider>
         </StoreConfigProvider>

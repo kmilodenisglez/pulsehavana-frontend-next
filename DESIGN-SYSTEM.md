@@ -40,6 +40,14 @@
 | Hairline border | `--color-border-hairline` | `rgba(0,0,0,0.08)` | `border-border-hairline` |
 | Functional success | `--color-status-success` | `#047857` | `text-status-success` |
 | Functional danger | `--color-status-danger` | `#b91c1c` | `text-status-danger` |
+| Brand intro surface | `--color-night` | `#0b0614` | `bg-night` |
+| Brand intro glow | `--color-night-glow` | `rgba(124,58,237,0.35)` | radial bloom behind the logo |
+
+The `night` tokens exist for **one** screen: `LoadingScreen`, the brand moment on
+a document load. It is the only dark surface in the storefront — do not reuse it
+for content sections. Its choreography is a token too (`--animate-intro-logo`,
+`--animate-intro-ring`, `--animate-intro-rise`, keyframes at the bottom of
+`globals.css`), so the intro is CSS and never depends on an animation library.
 
 ---
 
@@ -181,6 +189,7 @@ project's "laptop / desktop" step):
 | `src/lib/store-catalog.ts` | Catalog selection types + `catalogHref` (the `?cat=<slug>` contract) |
 | `src/lib/store-catalog.server.ts` | Storefront query: `getStoreCatalog(?cat=)`, cached per category tag |
 | `src/app/page.tsx` | Reads `?cat=`, streams the store into the page's static shell |
+| `src/components/LoadingScreen.tsx` | Brand intro on document load (`--color-night`, `--animate-intro-*`); unmounts itself, skipped under reduced motion |
 | `src/components/StoreFrontSkeleton.tsx` | Streaming fallback for the URL-resolved store body |
 | `src/components/CategoryRail.tsx` / `CollectionExplorer.tsx` | Mobile & tablet catalog explorer |
 | `src/components/DesktopCategoryNav.tsx` | Desktop nav: Tier 1 pills + Tier 2 megamenu (open state, backdrop, Escape) |

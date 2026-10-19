@@ -80,6 +80,16 @@
   --color-ink-primary: #1d1d1f;
   --color-ink-secondary: #6e6e73;
 
+  /* Brand intro — the one dark, cinematic surface (LoadingScreen). The rest of
+     the storefront is light; this is the brand moment before the shop shows. */
+  --color-night: #0b0614;
+  --color-night-glow: rgba(124, 58, 237, 0.35);
+
+  /* Intro choreography (LoadingScreen): logo drop-in, pulse ring, copy rise. */
+  --animate-intro-logo: intro-logo 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  --animate-intro-ring: intro-ring 2.2s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  --animate-intro-rise: intro-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+
   /* Functional tints & materials */
   --color-primary-tint: rgba(124, 58, 237, 0.1);
   --color-primary-tint-hover: rgba(124, 58, 237, 0.16);
@@ -183,6 +193,47 @@
 
   /* Breakpoints */
   --breakpoint-xs: 400px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Loading screen choreography (LoadingScreen.tsx)                    */
+/* ------------------------------------------------------------------ */
+@keyframes intro-logo {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+    filter: blur(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes intro-ring {
+  0% {
+    transform: scale(0.82);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ------------------------------------------------------------------ */
